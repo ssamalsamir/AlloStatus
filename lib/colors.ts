@@ -1,18 +1,45 @@
 import { clamp } from "./scoring/stats";
 import type { Depletor } from "./scoring/types";
-import type { WarningLevel } from "./insight/early-warning";
 
-// On-brand green ramp for the buffer ring and trend: a soft, pale sage when
-// you're depleted, deepening through to a rich forest green as you get stronger.
-// Hue stays in the green family; saturation and depth carry the level, so it
-// always reads as "green" while a fuller, richer ring signals a better day —
-// the calm, healthy end of Sonia Health's warm palette.
+// Resilience reads as a traffic light, keyed to the score itself: a clear red
+// when the buffer is low, amber through the medium band, forest green when it's
+// good. One scale drives the dial, the big number, the trend marker *and* the
+// check-engine light, so a glance at any of them tells the same story. The cut
+// points line up with scoreLabel's boundaries, so the colour and the word never
+// disagree — you'll never see "Strong" in red or "Low" in green.
+const LOW_MAX = 45; // below this the buffer is low      → red
+const GOOD_MIN = 60; // at or above this it's good        → green
+// [LOW_MAX, GOOD_MIN) is the medium band                → yellow
+
+export type ScoreBand = "low" | "medium" | "good";
+
+/** Which traffic-light band a 0–100 buffer score falls in. */
+export function scoreBand(pct: number): ScoreBand {
+  const p = clamp(pct, 0, 100);
+  if (p < LOW_MAX) return "low";
+  if (p < GOOD_MIN) return "medium";
+  return "good";
+}
+
+// Hue is locked per band, so the colour always reads unambiguously red / yellow
+// / green; only lightness eases a little within each band, so the ring still
+// feels alive as the score moves without ever drifting out of its colour family.
 export function scoreColor(pct: number): string {
-  const t = clamp(pct, 0, 100) / 100;
-  const hue = 142 + t * 18; // 142 (sage) → 160 (forest)
-  const sat = 18 + t * 24; // 18% (muted) → 42% (saturated)
-  const light = 66 - t * 32; // 66% (pale) → 34% (deep forest)
-  return `hsl(${Math.round(hue)} ${Math.round(sat)}% ${Math.round(light)}%)`;
+  const p = clamp(pct, 0, 100);
+  switch (scoreBand(p)) {
+    case "low": {
+      const t = p / LOW_MAX; // 0 → 1 across the red band
+      return `hsl(4 75% ${Math.round(56 - t * 8)}%)`; // 56% → 48%
+    }
+    case "medium": {
+      const t = (p - LOW_MAX) / (GOOD_MIN - LOW_MAX); // 0 → 1 across yellow
+      return `hsl(42 90% ${Math.round(50 - t * 4)}%)`; // 50% → 46%
+    }
+    default: {
+      const t = (p - GOOD_MIN) / (100 - GOOD_MIN); // 0 → 1 across green
+      return `hsl(150 46% ${Math.round(44 - t * 10)}%)`; // 44% → 34%
+    }
+  }
 }
 
 export function scoreLabel(pct: number): string {
@@ -33,21 +60,6 @@ export function severityColor(severity: Depletor["severity"]): string {
       return "hsl(26 48% 56%)";
     default:
       return "hsl(38 42% 62%)";
-  }
-}
-
-// The check-engine light's three states, on the warm palette: a calm forest
-// green when steady, warm sand when worth watching, clay when the warning is on.
-// Deliberately not a hard traffic-light red — it should read as a caring nudge,
-// not an alarm.
-export function warningColor(level: WarningLevel): string {
-  switch (level) {
-    case "warning":
-      return "hsl(12 54% 53%)";
-    case "watch":
-      return "hsl(36 56% 56%)";
-    default:
-      return "hsl(155 32% 38%)";
   }
 }
 
