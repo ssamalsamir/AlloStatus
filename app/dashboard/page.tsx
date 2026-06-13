@@ -7,6 +7,7 @@ import { CheckEngineLight } from "@/components/check-engine-light";
 import { TodayPanel } from "@/components/today-panel";
 import { TrendChart } from "@/components/trend-chart";
 import { SamplePuller } from "@/components/sample-puller";
+import { ChatWidget } from "@/components/chat-widget";
 
 export default async function DashboardPage({
   searchParams,
@@ -86,6 +87,8 @@ export default async function DashboardPage({
         <ConnectionsNote isDemo={!signedIn} />
         <Methodology />
       </main>
+
+      <ChatWidget seed={demo ? seed : undefined} />
     </div>
   );
 }
