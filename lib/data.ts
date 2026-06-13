@@ -9,10 +9,11 @@ import type { Viewer } from "@/lib/session";
 // room to spare. Older readings just don't affect today's score.
 const LOOKBACK_DAYS = 120;
 
-export async function loadAnalysis(viewer: Viewer): Promise<Analysis> {
-  const records = viewer.isDemo
-    ? generateHistory()
-    : await fetchRecords(viewer.id);
+// A null viewer means a logged-out visitor — they get the public demo, same as
+// anyone in demo mode. Signed-in users get their own data.
+export async function loadAnalysis(viewer: Viewer | null): Promise<Analysis> {
+  const records =
+    !viewer || viewer.isDemo ? generateHistory() : await fetchRecords(viewer.id);
   return analyze(records);
 }
 

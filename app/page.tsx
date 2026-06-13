@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
-import { getViewer } from "@/lib/session";
 
-export default async function Landing() {
-  const viewer = await getViewer();
-  redirect(viewer ? "/dashboard" : "/login");
+// The dashboard is public: logged-out visitors see the demo, signed-in users
+// see their own data. So the landing just forwards there.
+export default function Landing() {
+  redirect("/dashboard");
 }

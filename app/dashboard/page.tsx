@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/session";
 import { loadAnalysis } from "@/lib/data";
 import { FACTORS } from "@/lib/scoring";
@@ -7,8 +6,7 @@ import { TrendChart } from "@/components/trend-chart";
 
 export default async function DashboardPage() {
   const viewer = await getViewer();
-  if (!viewer) redirect("/login");
-
+  const signedIn = !!viewer && !viewer.isDemo;
   const analysis = await loadAnalysis(viewer);
 
   return (
@@ -17,25 +15,28 @@ export default async function DashboardPage() {
         <div>
           <h1 className="text-lg font-semibold tracking-tight">AlloStatus</h1>
           <p className="text-sm text-muted">
-            {viewer.isDemo ? "Demo — sample wearable + lifestyle data" : viewer.email}
+            {signedIn ? viewer!.email : "Sample data — sign in to track your own"}
           </p>
         </div>
-        {viewer.isDemo ? (
-          <span className="rounded-full border border-border px-3 py-1 text-xs text-muted">
-            Demo data
-          </span>
-        ) : (
+        {signedIn ? (
           <form
             action={async () => {
               "use server";
               const { signOut } = await import("@/auth");
-              await signOut({ redirectTo: "/login" });
+              await signOut({ redirectTo: "/dashboard" });
             }}
           >
             <button type="submit" className="text-sm text-muted transition hover:text-foreground">
               Sign out
             </button>
           </form>
+        ) : (
+          <a
+            href="/login"
+            className="rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-white transition hover:bg-accent-hover"
+          >
+            Sign in
+          </a>
         )}
       </header>
 
@@ -43,7 +44,7 @@ export default async function DashboardPage() {
         baselines={analysis.baselines}
         inputsToday={analysis.inputsToday}
         best30={analysis.best30?.bufferPct ?? null}
-        isDemo={viewer.isDemo}
+        isDemo={!signedIn}
       />
 
       <section className="mt-5 rounded-2xl border border-border bg-surface p-6 sm:p-8">
@@ -60,7 +61,7 @@ export default async function DashboardPage() {
         <TrendChart trend={analysis.trend} />
       </section>
 
-      <ConnectionsNote isDemo={viewer.isDemo} />
+      <ConnectionsNote isDemo={!signedIn} />
       <Methodology />
     </main>
   );
