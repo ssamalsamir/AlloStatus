@@ -57,7 +57,11 @@ export default async function DashboardPage({
           )}
         </EditorialIntro>
 
-        <CheckEngineLight warning={warning} />
+        <HowItWorks />
+
+        <div className="mt-4">
+          <CheckEngineLight warning={warning} />
+        </div>
 
         <div className="mt-4">
           <TodayPanel
@@ -81,7 +85,6 @@ export default async function DashboardPage({
           <TrendChart trend={analysis.trend} best={analysis.best30} />
         </section>
 
-        <HowItWorks />
         <ConnectionsNote isDemo={!signedIn} />
         <Methodology />
       </main>
