@@ -106,10 +106,9 @@ function SiteHeader({
 function ConnectionsNote({ isDemo }: { isDemo: boolean }) {
   const sources = [
     { name: "Google Fit", detail: "HRV, sleep & resting HR, pulled nightly" },
-    { name: "Apple Health", detail: "Export upload or a daily iOS Shortcut" },
   ];
   return (
-    <section className="mt-5 grid gap-4 sm:grid-cols-2">
+    <section className="mt-5 grid gap-4">
       {sources.map((src) => (
         <div key={src.name} className="card p-6">
           <div className="flex items-center justify-between">
