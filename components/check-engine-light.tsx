@@ -10,7 +10,7 @@ export function CheckEngineLight({ warning }: { warning: EarlyWarning }) {
   const lit = warning.level !== "steady";
 
   return (
-    <section className="card overflow-hidden p-7 sm:p-9">
+    <section className="card overflow-hidden p-5 sm:p-7">
       <div className="flex items-start gap-4 sm:gap-5">
         <StatusLight level={warning.level} color={color} />
 

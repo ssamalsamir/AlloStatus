@@ -36,9 +36,9 @@ export default async function DashboardPage({
     <div className="flex-1">
       <SiteHeader signedIn={signedIn} email={signedIn ? viewer!.email : null} />
 
-      <main className="mx-auto w-full max-w-3xl px-5 pb-20 sm:px-6">
+      <main className="mx-auto w-full max-w-5xl px-5 pb-14 sm:px-6">
         {/* Editorial intro — sets the calm, plain-spoken tone before the data. */}
-        <section className="py-10 sm:py-14">
+        <section className="py-8 sm:py-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-2">
             {demo ? "Sample reading" : "Your daily reading"}
           </p>
@@ -64,7 +64,7 @@ export default async function DashboardPage({
 
         <CheckEngineLight warning={warning} />
 
-        <div className="mt-5">
+        <div className="mt-4">
           <TodayPanel
             baselines={analysis.baselines}
             inputsToday={analysis.inputsToday}
@@ -74,7 +74,7 @@ export default async function DashboardPage({
           />
         </div>
 
-        <section className="card mt-5 p-7 sm:p-9">
+        <section className="card mt-4 p-5 sm:p-7">
           <div className="mb-5 flex items-baseline justify-between">
             <h2 className="eyebrow">Last 30 days</h2>
             {analysis.best30 && (
@@ -105,7 +105,7 @@ function SiteHeader({
 }) {
   return (
     <header className="sticky top-0 z-30 border-b border-border/70 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-4 sm:px-6">
+      <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-5 py-4 sm:px-6">
         <a href="/dashboard" className="flex items-center gap-2.5">
           <Logo className="size-[22px] text-[color:var(--accent)]" />
           <span className="font-display text-lg tracking-tight">AlloStatus</span>
@@ -143,9 +143,9 @@ function ConnectionsNote({ isDemo }: { isDemo: boolean }) {
     { name: "Google Fit", detail: "HRV, sleep & resting HR, pulled nightly" },
   ];
   return (
-    <section className="mt-5 grid gap-4">
+    <section className="mt-4 grid gap-4">
       {sources.map((src) => (
-        <div key={src.name} className="card p-6">
+        <div key={src.name} className="card p-5">
           <div className="flex items-center justify-between">
             <h3 className="font-display text-lg">{src.name}</h3>
             <span className="rounded-full bg-surface-2 px-2.5 py-1 text-xs text-muted">
@@ -180,7 +180,7 @@ function HowItWorks() {
   ];
 
   return (
-    <section className="card mt-5 p-7 sm:p-9">
+    <section className="card mt-4 p-5 sm:p-7">
       <h2 className="eyebrow mb-1">How it works</h2>
       <p className="font-display mb-6 text-2xl text-foreground">
         From raw signals to one honest number.
@@ -211,7 +211,7 @@ function HowItWorks() {
 
 function Methodology() {
   return (
-    <details className="card mt-5 p-7 sm:p-9">
+    <details className="card mt-4 p-5 sm:p-7">
       <summary className="eyebrow cursor-pointer list-none">
         The weights, in full
       </summary>

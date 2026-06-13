@@ -60,10 +60,10 @@ export function TodayPanel({
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* Hero: the score, the gap, and the ranked nudges. */}
-      <section className="card p-7 sm:p-9">
-        <div className="flex flex-col items-center gap-7 sm:flex-row sm:items-center sm:gap-9">
+      <section className="card p-5 sm:p-7">
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-8">
           <BufferRing value={buffer} color={warningColor(warningLevel)} />
           <div className="space-y-2.5 text-center sm:text-left">
             <p className="eyebrow">Resilience buffer · today</p>
@@ -78,14 +78,14 @@ export function TodayPanel({
           </div>
         </div>
 
-        <hr className="my-7 border-border" />
+        <hr className="my-6 border-border" />
 
         <h2 className="eyebrow mb-4">What&apos;s depleting your buffer</h2>
         <DepletionList depletors={depletors} />
       </section>
 
       {/* Full transparency: every factor versus your own normal. */}
-      <section className="card p-7 sm:p-9">
+      <section className="card p-5 sm:p-7">
         <h2 className="eyebrow mb-5">Your six factors today</h2>
         <FactorBars factors={factors} />
         <p className="mt-4 text-xs text-muted">
@@ -95,7 +95,7 @@ export function TodayPanel({
       </section>
 
       {/* The inputs you actually control, with a live preview of their effect. */}
-      <section className="card p-7 sm:p-9">
+      <section className="card p-5 sm:p-7">
         <div className="mb-5 flex items-center justify-between gap-4">
           <h2 className="eyebrow">Adjust today&apos;s inputs</h2>
           <div className="flex items-center gap-3">
@@ -114,7 +114,7 @@ export function TodayPanel({
           </div>
         </div>
 
-        <div className="space-y-5">
+        <div className="space-y-4">
           <Slider
             label="Diet quality"
             value={diet}
