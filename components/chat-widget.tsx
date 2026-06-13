@@ -54,6 +54,16 @@ export function ChatWidget({ seed }: { seed?: number }) {
           return next;
         });
       }
+      if (!acc.trim()) {
+        setMessages((m) => {
+          const next = [...m];
+          next[next.length - 1] = {
+            role: "assistant",
+            content: "I couldn't get a reply just now — the AI credential may be missing or not unlocked yet.",
+          };
+          return next;
+        });
+      }
     } catch {
       setMessages((m) => {
         const next = [...m];

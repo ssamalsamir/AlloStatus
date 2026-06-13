@@ -1,14 +1,23 @@
-import { streamText, type ModelMessage } from "ai";
+import { streamText, type LanguageModel, type ModelMessage } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { getViewer } from "@/lib/session";
 import { loadAnalysis } from "@/lib/data";
 import { buildChatSystemPrompt } from "@/lib/chat/context";
 
-// Direct Gemini wiring via a key (GEMINI_API_KEY). If it's absent the route still
-// responds — with a note on how to enable it — so the app keeps working without
-// any AI credentials, the same way the rest of AlloStatus does.
+// Gemini, two ways. If a key is set we call Google directly; otherwise, if the
+// project has Vercel AI Gateway access (an OIDC token or gateway key), we route
+// the same Gemini model through the gateway — no separate key needed. With
+// neither, the route still responds with a note, so the app keeps working
+// credential-free like the rest of AlloStatus.
 const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
+const hasGateway = !!(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN);
+const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+
+function resolveModel(): LanguageModel | null {
+  if (apiKey) return createGoogleGenerativeAI({ apiKey })(MODEL);
+  if (hasGateway) return `google/${MODEL}`; // routed through the Vercel AI Gateway
+  return null;
+}
 
 const plain = (body: string, status = 200) =>
   new Response(body, { status, headers: { "content-type": "text/plain; charset=utf-8" } });
@@ -20,9 +29,10 @@ export async function POST(request: Request): Promise<Response> {
   };
   if (!Array.isArray(messages)) return plain("Bad request", 400);
 
-  if (!apiKey) {
+  const model = resolveModel();
+  if (!model) {
     return plain(
-      "I need a Gemini API key to talk through your reading — add GEMINI_API_KEY to the environment and I'll come alive. Everything else in AlloStatus works without it.",
+      "I need Gemini access to talk through your reading — set GEMINI_API_KEY, or enable the Vercel AI Gateway. Everything else in AlloStatus works without it.",
     );
   }
 
@@ -44,9 +54,8 @@ export async function POST(request: Request): Promise<Response> {
     signedIn ? undefined : typeof seed === "number" ? seed : undefined,
   );
 
-  const google = createGoogleGenerativeAI({ apiKey });
   const result = streamText({
-    model: google(MODEL),
+    model,
     system: buildChatSystemPrompt(analysis, { isDemo: !signedIn }),
     messages: history,
     temperature: 0.6,
