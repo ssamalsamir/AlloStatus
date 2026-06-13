@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { getViewer } from "@/lib/session";
 import { loadAnalysis } from "@/lib/data";
 import { FACTORS } from "@/lib/scoring";
@@ -20,8 +21,17 @@ export default async function DashboardPage({
   const demo = !signedIn;
 
   const rawSeed = (await searchParams).seed;
-  const seed =
-    typeof rawSeed === "string" && /^\d+$/.test(rawSeed) ? Number(rawSeed) : undefined;
+  const hasSeed = typeof rawSeed === "string" && /^\d+$/.test(rawSeed);
+  const seed = hasSeed ? Number(rawSeed) : undefined;
+
+  // The landing starts blank: a logged-out visitor who hasn't generated a sample
+  // sees the pitch and a way in — never a reading we pulled up for them. A sample
+  // appears only once they generate one (which rolls a random ?seed=, see
+  // SamplePuller) or sign in for their own data.
+  if (demo && !hasSeed) {
+    return <EmptyLanding />;
+  }
+
   const analysis = await loadAnalysis(viewer, demo ? seed : undefined);
   const warning = detectEarlyWarning(analysis);
 
@@ -38,29 +48,14 @@ export default async function DashboardPage({
 
       <main className="mx-auto w-full max-w-5xl px-5 pb-14 sm:px-6">
         {/* Editorial intro — sets the calm, plain-spoken tone before the data. */}
-        <section className="py-8 sm:py-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-2">
-            {demo ? "Sample reading" : "Your daily reading"}
-          </p>
-          <h1 className="font-display mt-3 text-4xl leading-[1.1] text-foreground sm:text-5xl">
-            A check-engine light
-            <br />
-            <span className="italic">for burnout.</span>
-          </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
-            Run at 100% for long enough and something breaks. AlloStatus tracks a
-            daily resilience buffer from your wearables and lifestyle, and lights
-            up early — when the trend starts sliding — so you can ease off before
-            you hit a wall, not after.
-          </p>
-
+        <EditorialIntro eyebrow={demo ? "Sample reading" : "Your daily reading"}>
           {demo && (
             <div className="mt-8 space-y-3">
               <SamplePuller />
               <p className="max-w-xl text-sm text-muted">{sampleLine}</p>
             </div>
           )}
-        </section>
+        </EditorialIntro>
 
         <CheckEngineLight warning={warning} />
 
@@ -92,6 +87,69 @@ export default async function DashboardPage({
       </main>
 
       <ChatWidget seed={demo ? seed : undefined} />
+    </div>
+  );
+}
+
+// Shared editorial header (eyebrow + headline + pitch). The reading and the
+// blank landing both open with it; `children` carries whatever call-to-action
+// belongs underneath.
+function EditorialIntro({
+  eyebrow,
+  children,
+}: {
+  eyebrow: string;
+  children?: ReactNode;
+}) {
+  return (
+    <section className="py-8 sm:py-10">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-2">
+        {eyebrow}
+      </p>
+      <h1 className="font-display mt-3 text-4xl leading-[1.1] text-foreground sm:text-5xl">
+        A check-engine light
+        <br />
+        <span className="italic">for burnout.</span>
+      </h1>
+      <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
+        Run at 100% for long enough and something breaks. AlloStatus tracks a
+        daily resilience buffer from your wearables and lifestyle, and lights up
+        early — when the trend starts sliding — so you can ease off before you
+        hit a wall, not after.
+      </p>
+      {children}
+    </section>
+  );
+}
+
+// The logged-out landing before any sample exists: the pitch and a way in
+// (generate a demo reading, or sign in), but no reading pulled up for them.
+function EmptyLanding() {
+  return (
+    <div className="flex-1">
+      <SiteHeader signedIn={false} email={null} />
+
+      <main className="mx-auto w-full max-w-5xl px-5 pb-14 sm:px-6">
+        <EditorialIntro eyebrow="Demo">
+          <div className="mt-8 space-y-3">
+            <SamplePuller label="Generate a demo sample" />
+            <p className="max-w-xl text-sm text-muted">
+              Nothing pulled up yet. Generate a sample to explore the dashboard
+              with synthetic data, or{" "}
+              <a
+                href="/login"
+                className="text-foreground underline underline-offset-4"
+              >
+                sign in
+              </a>{" "}
+              to connect your own wearables.
+            </p>
+          </div>
+        </EditorialIntro>
+
+        <HowItWorks />
+        <Methodology />
+      </main>
     </div>
   );
 }

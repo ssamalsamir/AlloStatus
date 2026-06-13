@@ -75,9 +75,17 @@ export function randomPersona(seed: number): PersonaConfig {
   return { ...base, arc };
 }
 
-// A first-load sample that actually shows the depletion ranking doing its job
-// (a Low day with a clear multi-factor story) rather than a quiet Peak.
+// Fallback seed for the rare path that asks for a sample without one (the chat
+// API hit directly, or `npm run db:seed` without SEED_SEED) — a stable, known
+// week so those stay reproducible. The live demo never relies on it: every
+// visitor is sent to a randomized ?seed= URL (see the dashboard route).
 const DEFAULT_SEED = 100;
+
+// A fresh random seed for a new sample. Shared so every entry point — the first
+// dashboard load and the "Pull new sample" button — draws samples identically.
+export function randomSeed(): number {
+  return Math.floor(Math.random() * 1_000_000_000);
+}
 
 export function recordsForSeed(seed?: number | null): DailyRecord[] {
   return generateHistory(randomPersona(seed ?? DEFAULT_SEED));
