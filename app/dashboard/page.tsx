@@ -81,7 +81,7 @@ export default async function DashboardPage({
               </span>
             )}
           </div>
-          <TrendChart trend={analysis.trend} />
+          <TrendChart trend={analysis.trend} best={analysis.best30} />
         </section>
 
         <ConnectionsNote isDemo={!signedIn} />
