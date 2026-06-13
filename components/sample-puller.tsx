@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { randomSeed } from "@/lib/demo/sample";
 
 // "Pull new sample" dressed up to feel like reading from a real wearable: a
 // deliberate ~2s sync with smooth progress and plausible status steps, behind a
@@ -18,7 +19,7 @@ const STEPS = [
   { until: 100, label: "Scoring your buffer" },
 ];
 
-export function SamplePuller() {
+export function SamplePuller({ label = "Pull new sample" }: { label?: string }) {
   const router = useRouter();
   const [navPending, startNav] = useTransition();
   const [pulling, setPulling] = useState(false);
@@ -30,7 +31,7 @@ export function SamplePuller() {
     setPulling(true);
     setProgress(0);
 
-    const seed = Math.floor(Math.random() * 1_000_000_000);
+    const seed = randomSeed();
     const start = performance.now();
 
     const tick = (now: number) => {
@@ -61,7 +62,7 @@ export function SamplePuller() {
         className="btn-primary gap-2 px-5 py-2 text-sm disabled:opacity-60"
       >
         <RefreshIcon spinning={active} />
-        {active ? "Pulling…" : "Pull new sample"}
+        {active ? "Pulling…" : label}
       </button>
 
       {active && (
