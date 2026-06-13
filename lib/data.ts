@@ -1,6 +1,6 @@
 import { and, eq, gte } from "drizzle-orm";
 import { analyze, type Analysis, type DailyRecord } from "@/lib/scoring";
-import { recordsForProfile } from "@/lib/demo/profiles";
+import { recordsForSeed } from "@/lib/demo/sample";
 import { getDb } from "@/lib/db/client";
 import { lifestyleEntries, wearableReadings } from "@/lib/db/schema";
 import type { Viewer } from "@/lib/session";
@@ -9,15 +9,15 @@ import type { Viewer } from "@/lib/session";
 // room to spare. Older readings just don't affect today's score.
 const LOOKBACK_DAYS = 120;
 
-// A null viewer means a logged-out visitor — they get the public demo, same as
-// anyone in demo mode, and can switch between demo personas. Signed-in users get
-// their own data (the profile id is ignored).
+// A null viewer means a logged-out visitor — they get a synthetic sample (a
+// different one per seed). Signed-in users get their own data (the seed is
+// ignored).
 export async function loadAnalysis(
   viewer: Viewer | null,
-  profileId?: string | null,
+  demoSeed?: number | null,
 ): Promise<Analysis> {
   const records =
-    !viewer || viewer.isDemo ? recordsForProfile(profileId) : await fetchRecords(viewer.id);
+    !viewer || viewer.isDemo ? recordsForSeed(demoSeed) : await fetchRecords(viewer.id);
   return analyze(records);
 }
 

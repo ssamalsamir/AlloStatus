@@ -37,7 +37,9 @@ export interface PersonaConfig {
   arc?: ArcConfig;
 }
 
-function mulberry32(seed: number): () => number {
+// Seeded PRNG (mulberry32). Exported so the random-sample builder draws from the
+// same deterministic stream — same seed in, same sample out.
+export function makeRng(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) | 0;
@@ -65,7 +67,7 @@ function isoDaysBefore(base: Date, n: number): string {
 const EXERCISE_BY_DOW = [20, 12, 38, 15, 32, 12, 44];
 
 export function generateHistory(persona: PersonaConfig, days = 60): DailyRecord[] {
-  const rng = mulberry32(persona.seed);
+  const rng = makeRng(persona.seed);
   const gauss = (mean: number, sd: number): number => {
     const u1 = Math.max(rng(), 1e-9);
     const u2 = rng();
