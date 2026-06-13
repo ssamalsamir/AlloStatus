@@ -1,4 +1,4 @@
-import type { EarlyWarning } from "@/lib/insight/early-warning";
+import type { EarlyWarning, WarningLevel } from "@/lib/insight/early-warning";
 import { warningColor } from "@/lib/colors";
 import { SupportCard } from "./support-card";
 
@@ -12,7 +12,7 @@ export function CheckEngineLight({ warning }: { warning: EarlyWarning }) {
   return (
     <section className="card overflow-hidden p-7 sm:p-9">
       <div className="flex items-start gap-4 sm:gap-5">
-        <StatusLight color={color} lit={lit} />
+        <StatusLight level={warning.level} color={color} />
 
         <div className="min-w-0 flex-1">
           <p className="eyebrow">Check-engine light</p>
@@ -69,22 +69,67 @@ export function CheckEngineLight({ warning }: { warning: EarlyWarning }) {
   );
 }
 
-// A soft, glowing "light" — a filled dot ringed by a halo when it's on. All
-// static (no looping animation), in keeping with the calm aesthetic.
-function StatusLight({ color, lit }: { color: string; lit: boolean }) {
+// The light reads differently at each level — by glyph *and* by halo, not colour
+// alone, so the state is legible even without colour (and to a colour-blind eye):
+//   steady  → a calm check, flat, no halo
+//   watch   → an eye, a single soft ring (we're keeping an eye on it)
+//   warning → an alert mark, a stronger double ring
+// All static — no looping animation — in keeping with the calm aesthetic.
+function StatusLight({ level, color }: { level: WarningLevel; color: string }) {
+  const tint = (pct: number) => `color-mix(in srgb, ${color} ${pct}%, transparent)`;
+  const halo =
+    level === "warning"
+      ? `0 0 0 4px ${tint(18)}, 0 0 0 9px ${tint(8)}`
+      : level === "watch"
+        ? `0 0 0 4px ${tint(16)}`
+        : "none";
+
   return (
     <span
-      className="relative mt-1 flex size-7 shrink-0 items-center justify-center rounded-full"
-      style={{ backgroundColor: `color-mix(in srgb, ${color} 16%, transparent)` }}
+      className="relative mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full"
+      style={{ backgroundColor: tint(14), boxShadow: halo }}
       aria-hidden
     >
-      <span
-        className="size-3.5 rounded-full"
-        style={{
-          backgroundColor: color,
-          boxShadow: lit ? `0 0 0 4px color-mix(in srgb, ${color} 20%, transparent)` : "none",
-        }}
-      />
+      <LevelGlyph level={level} color={color} />
     </span>
+  );
+}
+
+function LevelGlyph({ level, color }: { level: WarningLevel; color: string }) {
+  const props = {
+    className: "size-[18px]",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: color,
+    strokeWidth: 2.2,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
+
+  if (level === "steady") {
+    // check
+    return (
+      <svg {...props}>
+        <path d="M20 6 9 17l-5-5" />
+      </svg>
+    );
+  }
+
+  if (level === "watch") {
+    // eye
+    return (
+      <svg {...props}>
+        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+        <circle cx="12" cy="12" r="2.6" />
+      </svg>
+    );
+  }
+
+  // warning — alert mark
+  return (
+    <svg {...props}>
+      <path d="M12 7.5v5" />
+      <path d="M12 16.5h.01" />
+    </svg>
   );
 }
