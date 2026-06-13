@@ -10,15 +10,19 @@ export function BufferRing({
   value,
   size = 208,
   stroke = 14,
+  color,
 }: {
   value: number;
   size?: number;
   stroke?: number;
+  /** Override the ring/number colour. Defaults to the green resilience ramp;
+   *  the dashboard passes the check-engine light's colour so the two agree. */
+  color?: string;
 }) {
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - clamp(value, 0, 100) / 100);
-  const color = scoreColor(value);
+  const ringColor = color ?? scoreColor(value);
 
   return (
     <div
@@ -42,7 +46,7 @@ export function BufferRing({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke={color}
+          stroke={ringColor}
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -54,7 +58,7 @@ export function BufferRing({
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span
           className="text-5xl font-semibold tabular-nums tracking-tight"
-          style={{ color }}
+          style={{ color: ringColor }}
         >
           {Math.round(value)}
         </span>

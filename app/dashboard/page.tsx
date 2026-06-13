@@ -8,6 +8,7 @@ import { TodayPanel } from "@/components/today-panel";
 import { TrendChart } from "@/components/trend-chart";
 import { SamplePuller } from "@/components/sample-puller";
 import { ChatWidget } from "@/components/chat-widget";
+import { Logo } from "@/components/logo";
 
 export default async function DashboardPage({
   searchParams,
@@ -69,6 +70,7 @@ export default async function DashboardPage({
             inputsToday={analysis.inputsToday}
             best30={analysis.best30?.bufferPct ?? null}
             isDemo={!signedIn}
+            warningLevel={warning.level}
           />
         </div>
 
@@ -84,6 +86,7 @@ export default async function DashboardPage({
           <TrendChart trend={analysis.trend} best={analysis.best30} />
         </section>
 
+        <HowItWorks />
         <ConnectionsNote isDemo={!signedIn} />
         <Methodology />
       </main>
@@ -104,11 +107,7 @@ function SiteHeader({
     <header className="sticky top-0 z-30 border-b border-border/70 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-4 sm:px-6">
         <a href="/dashboard" className="flex items-center gap-2.5">
-          <span
-            className="inline-block size-2.5 rounded-full"
-            style={{ background: "var(--accent)" }}
-            aria-hidden
-          />
+          <Logo className="size-[22px] text-[color:var(--accent)]" />
           <span className="font-display text-lg tracking-tight">AlloStatus</span>
         </a>
         {signedIn ? (
@@ -160,11 +159,61 @@ function ConnectionsNote({ isDemo }: { isDemo: boolean }) {
   );
 }
 
+function HowItWorks() {
+  const steps = [
+    {
+      title: "Read your signals",
+      body: "Wearables feed HRV, sleep timing and resting heart rate; you log diet, social connection and exercise — six factors in all.",
+    },
+    {
+      title: "Compare to your own normal",
+      body: "Each factor is scored against your rolling 30-day baseline, so “good” means good for you — not a population average.",
+    },
+    {
+      title: "One resilience buffer",
+      body: "The six combine into a single 0–100 score, with the factors draining it most ranked so you know exactly where to act.",
+    },
+    {
+      title: "Caught early",
+      body: "The check-engine light watches the trend, not just today, and lights up while a slide is still easy to reverse.",
+    },
+  ];
+
+  return (
+    <section className="card mt-5 p-7 sm:p-9">
+      <h2 className="eyebrow mb-1">How it works</h2>
+      <p className="font-display mb-6 text-2xl text-foreground">
+        From raw signals to one honest number.
+      </p>
+      <ol className="grid gap-x-6 gap-y-6 sm:grid-cols-2">
+        {steps.map((s, i) => (
+          <li key={s.title} className="flex gap-4">
+            <span
+              className="flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold tabular-nums"
+              style={{
+                color: "var(--accent)",
+                backgroundColor: "color-mix(in srgb, var(--accent) 12%, transparent)",
+              }}
+              aria-hidden
+            >
+              {i + 1}
+            </span>
+            <div className="min-w-0">
+              <h3 className="text-sm font-medium text-foreground">{s.title}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted">{s.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 function Methodology() {
   return (
     <details className="card mt-5 p-7 sm:p-9">
       <summary className="eyebrow cursor-pointer list-none">
-        How this score works
+        The weights, in full
       </summary>
       <p className="mt-4 text-sm leading-relaxed text-muted">
         Each factor is compared against your own rolling 30-day baseline, capped
