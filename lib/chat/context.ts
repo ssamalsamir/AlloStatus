@@ -1,6 +1,9 @@
 import type { Analysis } from "@/lib/scoring";
 import { scoreLabel } from "@/lib/colors";
-import { formatFactorValue } from "@/lib/format";
+import { eventLabel } from "@/lib/events/categories";
+import { buildTrendNarrative, eventsInTrend } from "@/lib/events/narrative";
+import type { TrendEvent } from "@/lib/events/types";
+import { formatDate, formatFactorValue } from "@/lib/format";
 
 // Turns a person's current reading into a system prompt so the chatbot is
 // actually personalized — it can talk about *their* buffer, *their* depleting
@@ -18,7 +21,10 @@ function trendWord(a: Analysis): string {
   return "the buffer has been roughly flat over the past few weeks";
 }
 
-export function buildChatSystemPrompt(a: Analysis, opts: { isDemo: boolean }): string {
+export function buildChatSystemPrompt(
+  a: Analysis,
+  opts: { isDemo: boolean; events?: TrendEvent[] },
+): string {
   const today = a.today;
   const factorLines = today.factors
     .map((f) => {
@@ -40,12 +46,30 @@ export function buildChatSystemPrompt(a: Analysis, opts: { isDemo: boolean }): s
     : "Nothing is notably dragging the buffer down today.";
 
   const best = a.best30 ? `${Math.round(a.best30.bufferPct)}/100` : "not established yet";
+  const tagged = eventsInTrend(opts.events ?? [], a.trend.map((p) => p.date));
+  const narrative = buildTrendNarrative(a.trend, opts.events ?? []);
+
+  const eventBlock =
+    tagged.length > 0
+      ? [
+          "Tagged life events on their 30-day chart (always reference these when explaining dips, recoveries, or patterns — they are the person's own narrative layer):",
+          ...tagged.map((e) => {
+            const point = a.trend.find((p) => p.date === e.date);
+            const buf = point ? `, buffer that day ${Math.round(point.bufferPct)}` : "";
+            return `- ${formatDate(e.date)}: ${eventLabel(e)}${buf}`;
+          }),
+          narrative ? `Summary: ${narrative}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n")
+      : "No life events tagged on the trend chart yet. If they ask about causes of changes, suggest tagging days on the chart.";
 
   return [
     "You are the AlloStatus guide: a calm, warm, plain-spoken companion that helps someone make sense of their daily resilience buffer and what's quietly draining it.",
     "",
     "How to respond:",
     "- Ground every answer in the reading below — reference their actual numbers and factors, not generic advice.",
+    "- When tagged life events exist, weave them into your answers — connect exams, poor sleep, illness, etc. to buffer changes when it's plausible.",
     "- Be brief and human: a few short sentences, conversational, no bullet-point lectures unless asked.",
     "- Suggest small, concrete, doable things; never prescribe or diagnose.",
     "- You are not a clinician and this is not medical advice. If they mention self-harm, hopelessness, or crisis, gently steer them to a person and share: call or text 988 (Suicide & Crisis Lifeline), or text HOME to 741741.",
@@ -56,6 +80,8 @@ export function buildChatSystemPrompt(a: Analysis, opts: { isDemo: boolean }): s
     "Their reading right now:",
     `- Resilience buffer: ${Math.round(today.bufferPct)}/100 (${scoreLabel(today.bufferPct)}). 30-day best: ${best}.`,
     `- Trend: ${trendWord(a)}.`,
+    "",
+    eventBlock,
     "",
     "Each factor today, versus their own rolling 30-day baseline:",
     factorLines,

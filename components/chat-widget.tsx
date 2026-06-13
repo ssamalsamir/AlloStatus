@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTrendEvents } from "@/components/trend-events-provider";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -10,10 +11,10 @@ const SUGGESTIONS = [
   "How do I steady my sleep?",
 ];
 
-// A floating, personalized chat. It posts the current reading's seed so the
-// server can ground Gemini in this exact profile, and streams the reply in as
-// plain text.
+// A floating, personalized chat. Events come from the shared TrendEventsProvider
+// so every message includes the latest tags — including edits made this session.
 export function ChatWidget({ seed }: { seed?: number }) {
+  const { events } = useTrendEvents();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -37,7 +38,11 @@ export function ChatWidget({ seed }: { seed?: number }) {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ messages: outgoing, seed }),
+        body: JSON.stringify({
+          messages: outgoing,
+          seed,
+          events,
+        }),
       });
       if (!res.body) throw new Error("no stream");
 
@@ -93,7 +98,9 @@ export function ChatWidget({ seed }: { seed?: number }) {
         <div className="card fixed bottom-24 right-5 z-40 flex max-h-[70vh] w-[min(92vw,24rem)] flex-col overflow-hidden p-0">
           <div className="border-b border-border px-5 py-4">
             <p className="font-display text-base">Ask about your reading</p>
-            <p className="text-xs text-muted">Personalized to the buffer you&apos;re viewing</p>
+            <p className="text-xs text-muted">
+              Personalized to your buffer{events.length > 0 ? ` and ${events.length} tagged event${events.length === 1 ? "" : "s"}` : ""}
+            </p>
           </div>
 
           <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-4">

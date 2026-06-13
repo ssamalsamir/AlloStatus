@@ -164,3 +164,17 @@ export const userBaselines = pgTable(
   },
   (table) => [primaryKey({ columns: [table.userId, table.factor] })],
 );
+
+/** User-tagged life events pinned to a day on the resilience trend. */
+export const trendEvents = pgTable("trend_event", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  date: date("date", { mode: "string" }).notNull(),
+  category: text("category").notNull(),
+  note: text("note"),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+});

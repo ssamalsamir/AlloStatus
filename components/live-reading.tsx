@@ -9,25 +9,27 @@ import {
   type FactorInputs,
 } from "@/lib/scoring";
 import { scoreColor } from "@/lib/colors";
-import type { EarlyWarning } from "@/lib/insight/early-warning";
+import { detectEarlyWarning } from "@/lib/insight/early-warning";
+import { useTrendEvents } from "./trend-events-provider";
 import { CheckEngineLight } from "./check-engine-light";
 import { TodayPanel } from "./today-panel";
-import { TrendChart } from "./trend-chart";
+import { TrendSection } from "./trend-chart";
 
 // Owns the live "what-if" state for the whole reading. The lifestyle sliders
 // live here — not inside TodayPanel — so dragging one re-colours the dial, the
 // check-engine light and the trend chart together: every score-driven colour
-// reads off the same live buffer. The check-engine light's *level* stays the
-// server's trajectory call; only its colour follows the live score.
+// reads off the same live buffer. The check-engine light's *colour* follows the
+// live score; its *level* follows the tagged events (re-running the server's
+// trajectory logic on the live event store), so adding or removing a tag updates
+// the warning immediately.
 export function LiveReading({
   analysis,
-  warning,
   isDemo,
 }: {
   analysis: Analysis;
-  warning: EarlyWarning;
   isDemo: boolean;
 }) {
+  const { events } = useTrendEvents();
   const { baselines, inputsToday } = analysis;
   const [diet, setDiet] = useState(Math.round(inputsToday.diet ?? 6));
   const [social, setSocial] = useState(Math.round(inputsToday.social ?? 6));
@@ -42,6 +44,13 @@ export function LiveReading({
       depletors: rankDepletors(scored, baselines),
     };
   }, [baselines, inputsToday, diet, social, exercise]);
+
+  // The warning level reads off the live event store, so tagging a day re-runs
+  // the same trajectory logic the server uses and the light updates in place.
+  const warning = useMemo(
+    () => detectEarlyWarning(analysis, events),
+    [analysis, events],
+  );
 
   // Today's live value flows into the trend's final point, and the 30-day best
   // is recomputed from it — so dragging today above the old best updates the
@@ -87,7 +96,7 @@ export function LiveReading({
             <span className="text-xs text-muted">best {Math.round(liveBest.bufferPct)}</span>
           )}
         </div>
-        <TrendChart trend={liveTrend} best={liveBest} />
+        <TrendSection trend={liveTrend} best={liveBest} />
       </section>
     </>
   );

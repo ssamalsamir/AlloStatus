@@ -2,6 +2,8 @@ import { streamText, type LanguageModel, type ModelMessage } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { getViewer } from "@/lib/session";
 import { loadAnalysis } from "@/lib/data";
+import { loadTrendEvents } from "@/lib/events/data";
+import { parseTrendEvents } from "@/lib/events/parse";
 import { buildChatSystemPrompt } from "@/lib/chat/context";
 
 // Gemini, two ways. If a key is set we call Google directly; otherwise, if the
@@ -23,9 +25,10 @@ const plain = (body: string, status = 200) =>
   new Response(body, { status, headers: { "content-type": "text/plain; charset=utf-8" } });
 
 export async function POST(request: Request): Promise<Response> {
-  const { messages, seed } = (await request.json().catch(() => ({}))) as {
+  const { messages, seed, events: clientEvents } = (await request.json().catch(() => ({}))) as {
     messages?: unknown;
     seed?: unknown;
+    events?: unknown;
   };
   if (!Array.isArray(messages)) return plain("Bad request", 400);
 
@@ -54,9 +57,16 @@ export async function POST(request: Request): Promise<Response> {
     signedIn ? undefined : typeof seed === "number" ? seed : undefined,
   );
 
+  // Chat always sends the live tag list from TrendEventsProvider.
+  const events = Array.isArray(clientEvents)
+    ? parseTrendEvents(clientEvents)
+    : signedIn && viewer
+      ? await loadTrendEvents(viewer.id)
+      : [];
+
   const result = streamText({
     model,
-    system: buildChatSystemPrompt(analysis, { isDemo: !signedIn }),
+    system: buildChatSystemPrompt(analysis, { isDemo: !signedIn, events }),
     messages: history,
     temperature: 0.6,
   });

@@ -3,10 +3,11 @@ import { getViewer } from "@/lib/session";
 import { loadAnalysis } from "@/lib/data";
 import { FACTORS } from "@/lib/scoring";
 import { scoreLabel } from "@/lib/colors";
-import { detectEarlyWarning } from "@/lib/insight/early-warning";
+import { DashboardEventsShell } from "@/components/dashboard-events-shell";
 import { LiveReading } from "@/components/live-reading";
+import { loadTrendEvents } from "@/lib/events/data";
+import type { TrendEvent } from "@/lib/events/types";
 import { SamplePuller } from "@/components/sample-puller";
-import { ChatWidget } from "@/components/chat-widget";
 import { Logo } from "@/components/logo";
 
 export default async function DashboardPage({
@@ -31,7 +32,8 @@ export default async function DashboardPage({
   }
 
   const analysis = await loadAnalysis(viewer, demo ? seed : undefined);
-  const warning = detectEarlyWarning(analysis);
+  const events: TrendEvent[] =
+    signedIn && viewer ? await loadTrendEvents(viewer.id) : [];
 
   const topDepletor = analysis.today.depletors[0]?.label;
   const sampleLine = `This sample reads ${scoreLabel(analysis.today.bufferPct)}${
@@ -41,30 +43,34 @@ export default async function DashboardPage({
   }. Pull another for a different week.`;
 
   return (
-    <div className="flex-1">
-      <SiteHeader signedIn={signedIn} email={signedIn ? viewer!.email : null} />
+    <DashboardEventsShell initialEvents={events} isDemo={demo} demoSeed={seed}>
+      <div className="flex-1">
+        <SiteHeader signedIn={signedIn} email={signedIn ? viewer!.email : null} />
 
-      <main className="mx-auto w-full max-w-5xl px-5 pb-14 sm:px-6">
-        {/* Editorial intro — sets the calm, plain-spoken tone before the data. */}
-        <EditorialIntro eyebrow={demo ? "Sample reading" : "Your daily reading"}>
-          {demo && (
-            <div className="mt-8 space-y-3">
-              <SamplePuller />
-              <p className="max-w-xl text-sm text-muted">{sampleLine}</p>
-            </div>
-          )}
-        </EditorialIntro>
+        <main className="mx-auto w-full max-w-5xl px-5 pb-14 sm:px-6">
+          {/* Editorial intro — sets the calm, plain-spoken tone before the data. */}
+          <EditorialIntro eyebrow={demo ? "Sample reading" : "Your daily reading"}>
+            {demo && (
+              <div className="mt-8 space-y-3">
+                <SamplePuller />
+                <p className="max-w-xl text-sm text-muted">{sampleLine}</p>
+              </div>
+            )}
+          </EditorialIntro>
 
-        <HowItWorks />
+          <HowItWorks />
 
-        <LiveReading analysis={analysis} warning={warning} isDemo={!signedIn} />
+          {/* The live reading: dragging a slider re-scores in the browser, which
+              re-colours the check-engine light, the buffer dial and the trend
+              together — while tagged events drive the warning level and feed the
+              chat. One component owns both so everything stays in sync. */}
+          <LiveReading analysis={analysis} isDemo={!signedIn} />
 
-        <ConnectionsNote isDemo={!signedIn} />
-        <Methodology />
-      </main>
-
-      <ChatWidget seed={demo ? seed : undefined} />
-    </div>
+          <ConnectionsNote isDemo={!signedIn} />
+          <Methodology />
+        </main>
+      </div>
+    </DashboardEventsShell>
   );
 }
 
