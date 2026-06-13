@@ -140,6 +140,43 @@ body::before {
   }
 }
 
+/* Typing indicator for the chat — three dots that breathe in sequence while the
+   assistant's reply is still streaming. Kept subtle: a soft fade + lift rather
+   than a hard bounce, so it reads as "thinking", not as decoration. */
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--muted-2, currentColor);
+  animation: typing-dot 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.typing-dot:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 0.9;
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typing-dot {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
 /* Range sliders, restyled to the warm palette so the controls feel of-a-piece
    rather than browser-default. */
 input[type="range"] {

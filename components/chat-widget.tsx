@@ -155,9 +155,19 @@ function Bubble({ msg, busy }: { msg: Msg; busy: boolean }) {
             : "max-w-[85%] rounded-2xl rounded-bl-sm bg-surface-2 px-3.5 py-2.5 text-sm leading-relaxed"
         }
       >
-        {msg.content || (busy ? <span className="text-muted">…</span> : null)}
+        {msg.content || (busy ? <TypingDots /> : null)}
       </div>
     </div>
+  );
+}
+
+function TypingDots() {
+  return (
+    <span className="flex items-center gap-1 py-1" role="status" aria-label="Assistant is typing">
+      <span className="typing-dot" />
+      <span className="typing-dot" />
+      <span className="typing-dot" />
+    </span>
   );
 }
 
