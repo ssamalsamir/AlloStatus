@@ -1,6 +1,6 @@
 import { and, eq, gte } from "drizzle-orm";
 import { analyze, type Analysis, type DailyRecord } from "@/lib/scoring";
-import { generateHistory } from "@/lib/demo/generate";
+import { recordsForProfile } from "@/lib/demo/profiles";
 import { getDb } from "@/lib/db/client";
 import { lifestyleEntries, wearableReadings } from "@/lib/db/schema";
 import type { Viewer } from "@/lib/session";
@@ -10,10 +10,14 @@ import type { Viewer } from "@/lib/session";
 const LOOKBACK_DAYS = 120;
 
 // A null viewer means a logged-out visitor — they get the public demo, same as
-// anyone in demo mode. Signed-in users get their own data.
-export async function loadAnalysis(viewer: Viewer | null): Promise<Analysis> {
+// anyone in demo mode, and can switch between demo personas. Signed-in users get
+// their own data (the profile id is ignored).
+export async function loadAnalysis(
+  viewer: Viewer | null,
+  profileId?: string | null,
+): Promise<Analysis> {
   const records =
-    !viewer || viewer.isDemo ? generateHistory() : await fetchRecords(viewer.id);
+    !viewer || viewer.isDemo ? recordsForProfile(profileId) : await fetchRecords(viewer.id);
   return analyze(records);
 }
 
