@@ -89,7 +89,7 @@ export function TodayPanel({
         </h2>
         <FactorBars factors={factors} />
         <p className="mt-4 text-xs text-muted">
-          Each bar is today against your own 30-day normal — right and green is
+          Each bar is today against your own 30-day normal — right and blue is
           helping, left and red is dragging.
         </p>
       </section>
@@ -109,7 +109,7 @@ export function TodayPanel({
               type="button"
               onClick={save}
               disabled={pending}
-              className="rounded-full border border-border px-4 py-1.5 text-sm font-medium transition hover:bg-surface-2 disabled:opacity-50"
+              className="rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-50"
             >
               {pending ? "Saving…" : "Save"}
             </button>
@@ -187,7 +187,7 @@ function Slider({
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         className="w-full"
-        style={{ accentColor: "var(--foreground)" }}
+        style={{ accentColor: "var(--accent)" }}
       />
     </label>
   );

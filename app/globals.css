@@ -1,27 +1,20 @@
 @import "tailwindcss";
 
-/* Calm, neutral surfaces with a single score-driven accent applied per element
-   (see lib/colors.ts). Light and dark both defined; dark follows the OS. */
+/* White-and-blue brand: clean white surfaces on a soft blue-tinted background,
+   navy text, one confident blue accent. Pinned to light so the identity is
+   consistent regardless of OS theme. The score still drives the ring/trend
+   colour (a blue ramp) via lib/colors.ts; red/amber are reserved for urgency. */
 :root {
-  --background: #fafaf9;
+  color-scheme: light;
+  --background: #f4f7fc;
   --surface: #ffffff;
-  --surface-2: #f3f3f2;
-  --foreground: #1c1c1e;
-  --muted: #6c6c74;
-  --border: #e6e5e2;
-  --ring-track: #ececea;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0b;
-    --surface: #141416;
-    --surface-2: #1c1c20;
-    --foreground: #f3f3f4;
-    --muted: #9a9aa3;
-    --border: #28282d;
-    --ring-track: #28282d;
-  }
+  --surface-2: #eef3fb;
+  --foreground: #112038;
+  --muted: #5a6b86;
+  --border: #e1e9f5;
+  --ring-track: #e7eefa;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
 }
 
 @theme inline {
@@ -31,6 +24,8 @@
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

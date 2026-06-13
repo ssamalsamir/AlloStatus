@@ -1,17 +1,15 @@
 import { clamp } from "./scoring/stats";
 import type { Depletor } from "./scoring/types";
 
-// The buffer has one accent colour that slides from a warm red when you're
-// depleted to green when you're strong. Keeping it on a continuous hue (rather
-// than three hard-coded buckets) means the ring shifts smoothly as the number
-// moves, which reads as calmer.
-export function scoreHue(pct: number): number {
+// On-brand blue ramp for the buffer ring and trend: a soft, pale steel-blue when
+// you're depleted, deepening to a vivid blue as you get stronger. Hue stays put;
+// saturation and depth carry the level, so it always reads as "blue" while a
+// fuller, richer ring still signals a better day.
+export function scoreColor(pct: number): string {
   const t = clamp(pct, 0, 100) / 100;
-  return 8 + t * (152 - 8); // 8° ≈ deep orange, 152° ≈ green
-}
-
-export function scoreColor(pct: number, sat = 64, light = 46): string {
-  return `hsl(${Math.round(scoreHue(pct))} ${sat}% ${light}%)`;
+  const sat = 46 + t * 44; // 46% → 90%
+  const light = 63 - t * 16; // 63% (pale) → 47% (deep)
+  return `hsl(221 ${Math.round(sat)}% ${Math.round(light)}%)`;
 }
 
 export function scoreLabel(pct: number): string {
@@ -33,7 +31,8 @@ export function severityColor(severity: Depletor["severity"]): string {
   }
 }
 
-// Positive / negative tints for the per-factor bars — green when a factor is
-// helping today, red when it's dragging, muted when there's no reading.
-export const POS = "hsl(150 52% 43%)";
-export const NEG = "hsl(8 64% 53%)";
+// Positive / negative tints for the per-factor bars — brand blue when a factor
+// is helping today, warm red when it's dragging. The blue/red split keeps the
+// diverging bars readable on white and on-palette.
+export const POS = "hsl(217 83% 53%)";
+export const NEG = "hsl(8 70% 54%)";

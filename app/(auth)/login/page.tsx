@@ -26,7 +26,7 @@ export default async function LoginPage() {
         >
           <button
             type="submit"
-            className="h-11 w-full rounded-full bg-foreground font-medium text-background transition hover:opacity-90"
+            className="h-11 w-full rounded-full bg-accent font-medium text-white transition hover:bg-accent-hover"
           >
             Continue with Google
           </button>
