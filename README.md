@@ -78,8 +78,8 @@ Six factors flow into one 0–100 buffer:
 | Sleep consistency | Wearable | 20% | steadier is better |
 | Resting heart rate | Wearable | 18% | lower is better |
 | Exercise | Self / wearable | 15% | higher is better |
-| Diet quality (1–5) | Self | 15% | higher is better |
-| Social support (1–5) | Self | 10% | higher is better |
+| Diet quality (1–10) | Self | 15% | higher is better |
+| Social support (1–10) | Self | 10% | higher is better |
 
 Weights are anchored to the allostatic-load literature (Seeman, McEwen) and live
 in one place — [`lib/scoring/weights.ts`](lib/scoring/weights.ts) — with a

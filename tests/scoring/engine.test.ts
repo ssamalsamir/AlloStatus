@@ -16,8 +16,8 @@ function averageRecord(date: string, overrides: Partial<DailyRecord> = {}): Dail
     sleepMidpointHours: 3.5,
     restingHrBpm: 62,
     exerciseMin: 24,
-    dietQuality: 3,
-    socialSupport: 3.3,
+    dietQuality: 6,
+    socialSupport: 6.6,
     ...overrides,
   };
 }
@@ -118,7 +118,7 @@ describe("scoring", () => {
       sleepConsistency: null,
       restingHr: null,
       exercise: null,
-      diet: 3.9, // ref mean 3.0, ref sd 0.9 → z ≈ +1
+      diet: 7.8, // ref mean 6.0, ref sd 1.8 → z ≈ +1
       social: null,
     };
     const baselines = baselinesFrom([sparse]);

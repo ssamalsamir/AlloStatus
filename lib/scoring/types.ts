@@ -20,8 +20,8 @@ export interface DailyRecord {
   sleepHours: number | null;
   sleepMidpointHours: number | null; // decimal hours, 0–24 (e.g. 3.5 = 03:30)
   restingHrBpm: number | null;
-  dietQuality: number | null; // 1–5
-  socialSupport: number | null; // 1–5
+  dietQuality: number | null; // 1–10
+  socialSupport: number | null; // 1–10
   exerciseMin: number | null;
 }
 

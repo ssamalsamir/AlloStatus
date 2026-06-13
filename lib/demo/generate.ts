@@ -32,8 +32,8 @@ export interface PersonaConfig {
   sleepMidBase: number; // decimal hours (3.4 = 03:24)
   sleepWander: number; // baseline SD of the sleep midpoint, in hours
   exerciseScale: number; // multiplier on the weekly exercise cadence
-  dietBase: number; // 1–5
-  socialBase: number; // 1–5
+  dietBase: number; // 1–10
+  socialBase: number; // 1–10
   arc?: ArcConfig;
 }
 
@@ -112,9 +112,9 @@ export function generateHistory(persona: PersonaConfig, days = 60): DailyRecord[
       0,
       Math.round(gauss(EXERCISE_BY_DOW[dow] * persona.exerciseScale, 6) + t * (arc?.exercise ?? 0)),
     );
-    const diet = Math.round(clamp(gauss(persona.dietBase, 0.42) + t * (arc?.diet ?? 0), 1, 5));
+    const diet = Math.round(clamp(gauss(persona.dietBase, 0.84) + t * (arc?.diet ?? 0), 1, 10));
     const social = Math.round(
-      clamp(gauss(persona.socialBase, 0.42) + t * (arc?.social ?? 0), 1, 5),
+      clamp(gauss(persona.socialBase, 0.84) + t * (arc?.social ?? 0), 1, 10),
     );
 
     records.push({

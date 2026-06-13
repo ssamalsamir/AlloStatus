@@ -28,8 +28,8 @@ export function randomPersona(seed: number): PersonaConfig {
     sleepMidBase: between(2.6, 4.4),
     sleepWander: between(0.35, 0.7),
     exerciseScale: between(0.6, 1.2),
-    dietBase: between(3.0, 4.2),
-    socialBase: between(3.0, 4.2),
+    dietBase: between(6.0, 8.4),
+    socialBase: between(6.0, 8.4),
   };
 
   const archetype = ARCHETYPES[Math.floor(r() * ARCHETYPES.length)];
@@ -45,8 +45,8 @@ export function randomPersona(seed: number): PersonaConfig {
         sleepHours: -between(0.4, 0.9),
         sleepWander: between(0.6, 1.2),
         exercise: -between(8, 16),
-        diet: -between(0.6, 1.2),
-        social: -between(0.8, 1.6),
+        diet: -between(1.2, 2.4),
+        social: -between(1.6, 3.2),
       };
       break;
     case "rebound":
@@ -57,15 +57,15 @@ export function randomPersona(seed: number): PersonaConfig {
         sleepHours: between(0.4, 0.8),
         sleepWander: -between(0.2, 0.5),
         exercise: between(12, 22),
-        diet: between(0.8, 1.3),
-        social: between(0.6, 1.2),
+        diet: between(1.6, 2.6),
+        social: between(1.2, 2.4),
       };
       break;
     case "sleep":
       arc = { days, sleepWander: between(1.4, 2.0), sleepHours: -between(0.2, 0.5) };
       break;
     case "sedentary":
-      arc = { days: Math.round(between(14, 18)), exercise: -between(34, 46), diet: -between(1.4, 2.2) };
+      arc = { days: Math.round(between(14, 18)), exercise: -between(34, 46), diet: -between(2.8, 4.4) };
       break;
     case "steady":
       arc = undefined; // a quiet week — buffer near your norm, little dragging

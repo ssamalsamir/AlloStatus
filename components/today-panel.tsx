@@ -29,8 +29,8 @@ export function TodayPanel({
   best30: number | null;
   isDemo: boolean;
 }) {
-  const [diet, setDiet] = useState(Math.round(inputsToday.diet ?? 3));
-  const [social, setSocial] = useState(Math.round(inputsToday.social ?? 3));
+  const [diet, setDiet] = useState(Math.round(inputsToday.diet ?? 6));
+  const [social, setSocial] = useState(Math.round(inputsToday.social ?? 6));
   const [exercise, setExercise] = useState(Math.round(inputsToday.exercise ?? 20));
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState<"saved" | "demo" | null>(null);
@@ -115,18 +115,18 @@ export function TodayPanel({
             label="Diet quality"
             value={diet}
             min={1}
-            max={5}
+            max={10}
             step={1}
-            display={`${diet}/5`}
+            display={`${diet}/10`}
             onChange={setDiet}
           />
           <Slider
             label="Social support"
             value={social}
             min={1}
-            max={5}
+            max={10}
             step={1}
-            display={`${social}/5`}
+            display={`${social}/10`}
             onChange={setSocial}
           />
           <Slider
@@ -135,7 +135,7 @@ export function TodayPanel({
             min={0}
             max={120}
             step={5}
-            display={`${exercise} min`}
+            display={`${exercise}${exercise >= 120 ? "+" : ""} min`}
             onChange={setExercise}
           />
         </div>

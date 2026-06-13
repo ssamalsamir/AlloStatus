@@ -114,8 +114,8 @@ export const lifestyleEntries = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     date: date("date", { mode: "string" }).notNull(),
-    dietQuality: smallint("diet_quality"), // 1–5
-    socialSupport: smallint("social_support"), // 1–5
+    dietQuality: smallint("diet_quality"), // 1–10
+    socialSupport: smallint("social_support"), // 1–10
     exerciseMin: smallint("exercise_min"),
     notes: text("notes"),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
