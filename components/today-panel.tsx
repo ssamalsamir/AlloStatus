@@ -8,8 +8,7 @@ import {
   type Baselines,
   type FactorInputs,
 } from "@/lib/scoring";
-import { scoreLabel, warningColor } from "@/lib/colors";
-import type { WarningLevel } from "@/lib/insight/early-warning";
+import { scoreLabel } from "@/lib/colors";
 import { saveLifestyle } from "@/app/actions";
 import { BufferRing } from "./buffer-ring";
 import { DepletionList } from "./depletion-list";
@@ -24,14 +23,11 @@ export function TodayPanel({
   inputsToday,
   best30,
   isDemo,
-  warningLevel,
 }: {
   baselines: Baselines;
   inputsToday: FactorInputs;
   best30: number | null;
   isDemo: boolean;
-  /** The check-engine light's level, so the buffer dial wears the same colour. */
-  warningLevel: WarningLevel;
 }) {
   const [diet, setDiet] = useState(Math.round(inputsToday.diet ?? 6));
   const [social, setSocial] = useState(Math.round(inputsToday.social ?? 6));
@@ -64,7 +60,9 @@ export function TodayPanel({
       {/* Hero: the score, the gap, and the ranked nudges. */}
       <section className="card p-5 sm:p-7">
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-8">
-          <BufferRing value={buffer} color={warningColor(warningLevel)} />
+          {/* No colour override: the ring uses the score ramp, so its colour
+              matches the actual buffer value and the trend chart below. */}
+          <BufferRing value={buffer} />
           <div className="space-y-2.5 text-center sm:text-left">
             <p className="eyebrow">Resilience buffer · today</p>
             <p className="font-display text-4xl text-foreground">{scoreLabel(buffer)}</p>

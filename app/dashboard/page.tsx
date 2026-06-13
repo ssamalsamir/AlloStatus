@@ -69,7 +69,6 @@ export default async function DashboardPage({
             inputsToday={analysis.inputsToday}
             best30={analysis.best30?.bufferPct ?? null}
             isDemo={!signedIn}
-            warningLevel={warning.level}
           />
         </div>
 
