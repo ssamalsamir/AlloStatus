@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { getViewer } from "@/lib/session";
 import { loadAnalysis } from "@/lib/data";
 import { FACTORS } from "@/lib/scoring";
-import { scoreLabel } from "@/lib/colors";
+import { scoreColor, scoreLabel } from "@/lib/colors";
 import { detectEarlyWarning } from "@/lib/insight/early-warning";
 import { CheckEngineLight } from "@/components/check-engine-light";
 import { TodayPanel } from "@/components/today-panel";
@@ -60,7 +60,7 @@ export default async function DashboardPage({
         <HowItWorks />
 
         <div className="mt-4">
-          <CheckEngineLight warning={warning} />
+          <CheckEngineLight warning={warning} color={scoreColor(analysis.today.bufferPct)} />
         </div>
 
         <div className="mt-4">
