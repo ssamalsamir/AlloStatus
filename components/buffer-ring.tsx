@@ -15,8 +15,8 @@ export function BufferRing({
   value: number;
   size?: number;
   stroke?: number;
-  /** Override the ring/number colour. Defaults to the green resilience ramp;
-   *  the dashboard passes the check-engine light's colour so the two agree. */
+  /** Override the ring/number colour. Defaults to the green resilience ramp
+   *  (scoreColor), so the ring's colour tracks the actual buffer value. */
   color?: string;
 }) {
   const radius = (size - stroke) / 2;

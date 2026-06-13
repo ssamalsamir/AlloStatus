@@ -1,12 +1,13 @@
 import type { EarlyWarning, WarningLevel } from "@/lib/insight/early-warning";
-import { warningColor } from "@/lib/colors";
 import { SupportCard } from "./support-card";
 
 // The check-engine light. A calm status panel that reads the *trajectory* of the
 // buffer, not just today's number — steady / watch / warning — names the exact
 // patterns that lit it up, and (when it's on) opens the door to support.
-export function CheckEngineLight({ warning }: { warning: EarlyWarning }) {
-  const color = warningColor(warning.level);
+//
+// Colour is supplied by the caller so it matches the buffer dial (the score
+// ramp); the *level* is still legible without colour, via the glyph and halo.
+export function CheckEngineLight({ warning, color }: { warning: EarlyWarning; color: string }) {
   const lit = warning.level !== "steady";
 
   return (
