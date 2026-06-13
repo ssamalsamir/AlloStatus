@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/auth";
+import { getViewer } from "@/lib/session";
 
 export default async function Landing() {
-  const session = await auth();
-  redirect(session ? "/dashboard" : "/login");
+  const viewer = await getViewer();
+  redirect(viewer ? "/dashboard" : "/login");
 }
