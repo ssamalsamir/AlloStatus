@@ -2,9 +2,11 @@ import { getViewer } from "@/lib/session";
 import { loadAnalysis } from "@/lib/data";
 import { FACTORS } from "@/lib/scoring";
 import { scoreLabel } from "@/lib/colors";
+import { detectEarlyWarning } from "@/lib/insight/early-warning";
+import { CheckEngineLight } from "@/components/check-engine-light";
 import { TodayPanel } from "@/components/today-panel";
 import { TrendChart } from "@/components/trend-chart";
-import { ShuffleButton } from "@/components/shuffle-button";
+import { SamplePuller } from "@/components/sample-puller";
 
 export default async function DashboardPage({
   searchParams,
@@ -19,6 +21,7 @@ export default async function DashboardPage({
   const seed =
     typeof rawSeed === "string" && /^\d+$/.test(rawSeed) ? Number(rawSeed) : undefined;
   const analysis = await loadAnalysis(viewer, demo ? seed : undefined);
+  const warning = detectEarlyWarning(analysis);
 
   const topDepletor = analysis.today.depletors[0]?.label;
   const sampleLine = `This sample reads ${scoreLabel(analysis.today.bufferPct)}${
@@ -38,30 +41,35 @@ export default async function DashboardPage({
             {demo ? "Sample reading" : "Your daily reading"}
           </p>
           <h1 className="font-display mt-3 text-4xl leading-[1.1] text-foreground sm:text-5xl">
-            How much can you
+            A check-engine light
             <br />
-            <span className="italic">carry today?</span>
+            <span className="italic">for burnout.</span>
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
-            A daily resilience buffer drawn from your wearables and a few
-            lifestyle inputs — and a ranked, plain-language breakdown of what is
-            quietly draining it right now.
+            Run at 100% for long enough and something breaks. AlloStatus tracks a
+            daily resilience buffer from your wearables and lifestyle, and lights
+            up early — when the trend starts sliding — so you can ease off before
+            you hit a wall, not after.
           </p>
 
           {demo && (
             <div className="mt-8 space-y-3">
-              <ShuffleButton />
+              <SamplePuller />
               <p className="max-w-xl text-sm text-muted">{sampleLine}</p>
             </div>
           )}
         </section>
 
-        <TodayPanel
-          baselines={analysis.baselines}
-          inputsToday={analysis.inputsToday}
-          best30={analysis.best30?.bufferPct ?? null}
-          isDemo={!signedIn}
-        />
+        <CheckEngineLight warning={warning} />
+
+        <div className="mt-5">
+          <TodayPanel
+            baselines={analysis.baselines}
+            inputsToday={analysis.inputsToday}
+            best30={analysis.best30?.bufferPct ?? null}
+            isDemo={!signedIn}
+          />
+        </div>
 
         <section className="card mt-5 p-7 sm:p-9">
           <div className="mb-5 flex items-baseline justify-between">

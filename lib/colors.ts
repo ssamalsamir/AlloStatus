@@ -1,5 +1,6 @@
 import { clamp } from "./scoring/stats";
 import type { Depletor } from "./scoring/types";
+import type { WarningLevel } from "./insight/early-warning";
 
 // On-brand green ramp for the buffer ring and trend: a soft, pale sage when
 // you're depleted, deepening through to a rich forest green as you get stronger.
@@ -32,6 +33,21 @@ export function severityColor(severity: Depletor["severity"]): string {
       return "hsl(26 48% 56%)";
     default:
       return "hsl(38 42% 62%)";
+  }
+}
+
+// The check-engine light's three states, on the warm palette: a calm forest
+// green when steady, warm sand when worth watching, clay when the warning is on.
+// Deliberately not a hard traffic-light red — it should read as a caring nudge,
+// not an alarm.
+export function warningColor(level: WarningLevel): string {
+  switch (level) {
+    case "warning":
+      return "hsl(12 54% 53%)";
+    case "watch":
+      return "hsl(36 56% 56%)";
+    default:
+      return "hsl(155 32% 38%)";
   }
 }
 

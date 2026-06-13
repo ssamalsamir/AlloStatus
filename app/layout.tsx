@@ -17,9 +17,9 @@ const sourceSans = Source_Sans_3({
 });
 
 export const metadata: Metadata = {
-  title: "AlloStatus",
+  title: "AlloStatus — a check-engine light for burnout",
   description:
-    "A daily resilience score from your wearables + lifestyle, modeled on allostatic load — and the ranked nudges to move it.",
+    "An early-warning resilience tracker modeled on allostatic load: a daily buffer from your wearables + lifestyle that lights up when your trend starts sliding — so you can act before you hit a wall.",
 };
 
 export default function RootLayout({
