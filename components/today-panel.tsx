@@ -58,12 +58,12 @@ export function TodayPanel({
   return (
     <div className="space-y-5">
       {/* Hero: the score, the gap, and the ranked nudges. */}
-      <section className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+      <section className="card p-7 sm:p-9">
         <div className="flex flex-col items-center gap-7 sm:flex-row sm:items-center sm:gap-9">
           <BufferRing value={buffer} />
-          <div className="space-y-2 text-center sm:text-left">
-            <p className="text-sm text-muted">Resilience buffer · today</p>
-            <p className="text-3xl font-semibold tracking-tight">{scoreLabel(buffer)}</p>
+          <div className="space-y-2.5 text-center sm:text-left">
+            <p className="eyebrow">Resilience buffer · today</p>
+            <p className="font-display text-4xl text-foreground">{scoreLabel(buffer)}</p>
             <p className="text-sm text-muted leading-relaxed">
               {gap == null
                 ? "Building your baseline — keep logging and this sharpens up."
@@ -74,32 +74,26 @@ export function TodayPanel({
           </div>
         </div>
 
-        <hr className="my-6 border-border" />
+        <hr className="my-7 border-border" />
 
-        <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-muted">
-          What&apos;s depleting your buffer
-        </h2>
+        <h2 className="eyebrow mb-4">What&apos;s depleting your buffer</h2>
         <DepletionList depletors={depletors} />
       </section>
 
       {/* Full transparency: every factor versus your own normal. */}
-      <section className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
-        <h2 className="mb-5 text-sm font-medium uppercase tracking-wider text-muted">
-          Your six factors today
-        </h2>
+      <section className="card p-7 sm:p-9">
+        <h2 className="eyebrow mb-5">Your six factors today</h2>
         <FactorBars factors={factors} />
         <p className="mt-4 text-xs text-muted">
-          Each bar is today against your own 30-day normal — right and blue is
-          helping, left and red is dragging.
+          Each bar is today against your own 30-day normal — right and green is
+          helping, left and clay is dragging.
         </p>
       </section>
 
       {/* The inputs you actually control, with a live preview of their effect. */}
-      <section className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+      <section className="card p-7 sm:p-9">
         <div className="mb-5 flex items-center justify-between gap-4">
-          <h2 className="text-sm font-medium uppercase tracking-wider text-muted">
-            Adjust today&apos;s inputs
-          </h2>
+          <h2 className="eyebrow">Adjust today&apos;s inputs</h2>
           <div className="flex items-center gap-3">
             {saved === "demo" && (
               <span className="text-xs text-muted">Preview only in demo</span>
@@ -109,7 +103,7 @@ export function TodayPanel({
               type="button"
               onClick={save}
               disabled={pending}
-              className="rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-50"
+              className="btn-primary px-5 py-2 text-sm"
             >
               {pending ? "Saving…" : "Save"}
             </button>

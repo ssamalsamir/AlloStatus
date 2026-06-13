@@ -8,10 +8,17 @@ export default async function LoginPage() {
   if (await getViewer()) redirect("/dashboard");
 
   return (
-    <main className="flex flex-1 items-center justify-center px-6">
-      <div className="w-full max-w-sm space-y-8 text-center">
-        <div className="space-y-3">
-          <h1 className="text-3xl font-semibold tracking-tight">AlloStatus</h1>
+    <main className="flex flex-1 items-center justify-center px-6 py-16">
+      <div className="card w-full max-w-md space-y-8 p-9 text-center sm:p-11">
+        <div className="space-y-4">
+          <span
+            className="mx-auto block size-3 rounded-full"
+            style={{ background: "var(--accent)" }}
+            aria-hidden
+          />
+          <h1 className="font-display text-3xl text-foreground">
+            Welcome to <span className="italic">AlloStatus</span>
+          </h1>
           <p className="text-sm text-muted leading-relaxed">
             A daily resilience-buffer score from your wearables and lifestyle —
             and a ranked breakdown of what&apos;s depleting it right now.
@@ -24,10 +31,7 @@ export default async function LoginPage() {
             await signIn("google", { redirectTo: "/dashboard" });
           }}
         >
-          <button
-            type="submit"
-            className="h-11 w-full rounded-full bg-accent font-medium text-white transition hover:bg-accent-hover"
-          >
+          <button type="submit" className="btn-primary h-11 w-full">
             Continue with Google
           </button>
         </form>

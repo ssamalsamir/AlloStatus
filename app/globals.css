@@ -1,20 +1,38 @@
 @import "tailwindcss";
 
-/* White-and-blue brand: clean white surfaces on a soft blue-tinted background,
-   navy text, one confident blue accent. Pinned to light so the identity is
-   consistent regardless of OS theme. The score still drives the ring/trend
-   colour (a blue ramp) via lib/colors.ts; red/amber are reserved for urgency. */
+/* Warm, editorial wellness identity — inspired by Sonia Health.
+   A soft cream canvas, white surfaces with gentle shadows instead of hard
+   borders, warm near-black text, and a calm deep-forest brand accent. The
+   buffer score drives a sage→forest green ramp (lib/colors.ts); warm clay is
+   reserved for urgency. Pinned to light so the identity is consistent
+   regardless of OS theme. */
 :root {
   color-scheme: light;
-  --background: #f4f7fc;
+
+  --background: #f8f6f2;
   --surface: #ffffff;
-  --surface-2: #eef3fb;
-  --foreground: #112038;
-  --muted: #5a6b86;
-  --border: #e1e9f5;
-  --ring-track: #e7eefa;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
+  --surface-2: #f0ede8;
+  --foreground: #2c2a26;
+  --muted: #8a867e;
+  --muted-2: #b5b1a9;
+  --border: #e8e5df;
+  --border-subtle: #f0ede8;
+  --ring-track: #efebe3;
+
+  /* Deep-forest brand accent (their "forest"), warm clay charcoal for hover. */
+  --accent: #1f3d34;
+  --accent-hover: #15302a;
+
+  /* Soft tinted washes for ambient backgrounds and chips. */
+  --accent-sky: #b8c4d4;
+  --accent-sage: #c5d4c0;
+  --accent-lavender: #d4c4d0;
+  --accent-sand: #d4cdb8;
+  --forest: #0f221e;
+
+  --shadow-sm: 0 1px 2px rgba(36, 34, 30, 0.04);
+  --shadow-md: 0 6px 20px rgba(36, 34, 30, 0.06);
+  --shadow-lg: 0 14px 40px rgba(36, 34, 30, 0.08);
 }
 
 @theme inline {
@@ -23,31 +41,139 @@
   --color-surface-2: var(--surface-2);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
   --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-sage: var(--accent-sage);
+  --color-sand: var(--accent-sand);
+  --color-lavender: var(--accent-lavender);
+  --color-sky: var(--accent-sky);
+  --color-forest: var(--forest);
+  --font-sans: var(--font-source-sans);
+  --font-serif: var(--font-baskerville);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ambient warmth: two soft, static tinted glows behind the content. Calm and
+   editorial — no motion, on-brand. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 12% -8%, rgba(197, 212, 192, 0.28), transparent 60%),
+    radial-gradient(50rem 38rem at 100% 0%, rgba(212, 205, 184, 0.26), transparent 55%),
+    radial-gradient(46rem 40rem at 80% 110%, rgba(212, 196, 208, 0.2), transparent 60%);
+}
+
+/* Serif display type — quiet, generous tracking for the editorial headlines. */
+.font-display {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Soft white card: gentle shadow + a faint warm ring instead of a hard border,
+   the signature surface treatment of the warm palette. */
+.card {
+  background: var(--surface);
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-md);
+  outline: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  outline-offset: -1px;
+}
+
+/* Small, tracked, uppercase section label. */
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+}
+
+/* Pill CTA in the deep-forest accent. */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  line-height: 1;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  box-shadow: var(--shadow-md);
+}
+.btn-primary:active {
+  transform: translateY(1px);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
 }
 
 /* The buffer ring: draw in from empty once on load, then glide whenever the
    live sliders move the score. --ring-circ is the full circumference, set inline
    per ring size. */
 .buffer-ring-progress {
-  transition: stroke-dashoffset 0.6s ease, stroke 0.4s ease;
-  animation: buffer-ring-draw 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: stroke-dashoffset 0.7s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.4s ease;
+  animation: buffer-ring-draw 1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes buffer-ring-draw {
   from {
     stroke-dashoffset: var(--ring-circ);
   }
+}
+
+/* Range sliders, restyled to the warm palette so the controls feel of-a-piece
+   rather than browser-default. */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--surface-2);
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: var(--surface);
+  border: 1.5px solid var(--accent);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.08);
+  box-shadow: var(--shadow-md);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: var(--surface);
+  border: 1.5px solid var(--accent);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
 }
 
 @media (prefers-reduced-motion: reduce) {
