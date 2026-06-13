@@ -6,7 +6,7 @@ config();
 import { desc, eq } from "drizzle-orm";
 import { getDb, type Db } from "@/lib/db/client";
 import { lifestyleEntries, users } from "@/lib/db/schema";
-import { generateHistory } from "@/lib/demo/generate";
+import { recordsForProfile } from "@/lib/demo/profiles";
 import { upsertReadings } from "@/lib/wearables/persist";
 
 // Backfills 60 days of plausible history so the dashboard has something to show
@@ -21,7 +21,7 @@ async function main() {
   const user = await resolveUser(db, process.env.SEED_EMAIL);
   console.log(`Seeding 60 days for ${user.email} (${user.id})`);
 
-  const records = generateHistory();
+  const records = recordsForProfile(process.env.SEED_PROFILE);
 
   const wearableDays = await upsertReadings(
     db,

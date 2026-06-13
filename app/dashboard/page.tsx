@@ -1,13 +1,24 @@
 import { getViewer } from "@/lib/session";
 import { loadAnalysis } from "@/lib/data";
 import { FACTORS } from "@/lib/scoring";
+import { profileById } from "@/lib/demo/profiles";
 import { TodayPanel } from "@/components/today-panel";
 import { TrendChart } from "@/components/trend-chart";
+import { ProfileSwitcher } from "@/components/profile-switcher";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const viewer = await getViewer();
   const signedIn = !!viewer && !viewer.isDemo;
-  const analysis = await loadAnalysis(viewer);
+
+  const rawProfile = (await searchParams).profile;
+  const profile = signedIn
+    ? null
+    : profileById(typeof rawProfile === "string" ? rawProfile : undefined);
+  const analysis = await loadAnalysis(viewer, profile?.id);
 
   return (
     <div className="flex-1">
@@ -17,7 +28,7 @@ export default async function DashboardPage() {
         {/* Editorial intro — sets the calm, plain-spoken tone before the data. */}
         <section className="py-10 sm:py-14">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-2">
-            {signedIn ? "Your daily reading" : "Sample reading"}
+            {profile ? `Sample reading · ${profile.name}` : "Your daily reading"}
           </p>
           <h1 className="font-display mt-3 text-4xl leading-[1.1] text-foreground sm:text-5xl">
             How much can you
@@ -29,6 +40,14 @@ export default async function DashboardPage() {
             lifestyle inputs — and a ranked, plain-language breakdown of what is
             quietly draining it right now.
           </p>
+
+          {profile && (
+            <div className="mt-8 space-y-2.5">
+              <p className="eyebrow">Demo profiles</p>
+              <ProfileSwitcher activeId={profile.id} />
+              <p className="text-sm text-muted">{profile.blurb}</p>
+            </div>
+          )}
         </section>
 
         <TodayPanel
