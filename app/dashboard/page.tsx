@@ -2,11 +2,9 @@ import type { ReactNode } from "react";
 import { getViewer } from "@/lib/session";
 import { loadAnalysis } from "@/lib/data";
 import { FACTORS } from "@/lib/scoring";
-import { scoreColor, scoreLabel } from "@/lib/colors";
+import { scoreLabel } from "@/lib/colors";
 import { detectEarlyWarning } from "@/lib/insight/early-warning";
-import { CheckEngineLight } from "@/components/check-engine-light";
-import { TodayPanel } from "@/components/today-panel";
-import { TrendChart } from "@/components/trend-chart";
+import { LiveReading } from "@/components/live-reading";
 import { SamplePuller } from "@/components/sample-puller";
 import { ChatWidget } from "@/components/chat-widget";
 import { Logo } from "@/components/logo";
@@ -59,30 +57,7 @@ export default async function DashboardPage({
 
         <HowItWorks />
 
-        <div className="mt-4">
-          <CheckEngineLight warning={warning} color={scoreColor(analysis.today.bufferPct)} />
-        </div>
-
-        <div className="mt-4">
-          <TodayPanel
-            baselines={analysis.baselines}
-            inputsToday={analysis.inputsToday}
-            best30={analysis.best30?.bufferPct ?? null}
-            isDemo={!signedIn}
-          />
-        </div>
-
-        <section className="card mt-4 p-5 sm:p-7">
-          <div className="mb-5 flex items-baseline justify-between">
-            <h2 className="eyebrow">Last 30 days</h2>
-            {analysis.best30 && (
-              <span className="text-xs text-muted">
-                best {Math.round(analysis.best30.bufferPct)}
-              </span>
-            )}
-          </div>
-          <TrendChart trend={analysis.trend} best={analysis.best30} />
-        </section>
+        <LiveReading analysis={analysis} warning={warning} isDemo={!signedIn} />
 
         <ConnectionsNote isDemo={!signedIn} />
         <Methodology />

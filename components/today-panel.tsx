@@ -1,49 +1,44 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
-import {
-  bufferFromFactors,
-  rankDepletors,
-  scoreFactors,
-  type Baselines,
-  type FactorInputs,
-} from "@/lib/scoring";
+import { useState, useTransition } from "react";
+import type { Depletor, FactorScore } from "@/lib/scoring";
 import { scoreLabel } from "@/lib/colors";
 import { saveLifestyle } from "@/app/actions";
 import { BufferRing } from "./buffer-ring";
 import { DepletionList } from "./depletion-list";
 import { FactorBars } from "./factor-bars";
 
-// The interactive heart of the dashboard. It re-runs the *same* scoring
-// functions the server used, so dragging a slider recomputes the buffer, the
-// depletion ranking, and the factor bars instantly — no round trip — and the
-// numbers always agree with what persistence would produce.
+// The interactive heart of the dashboard — now presentational. Its parent
+// (LiveReading) owns the slider state and runs the scoring, so the buffer dial,
+// the depletion ranking, the factor bars, the check-engine light and the trend
+// chart all move together off one live computation.
 export function TodayPanel({
-  baselines,
-  inputsToday,
+  buffer,
+  factors,
+  depletors,
   best30,
   isDemo,
+  diet,
+  social,
+  exercise,
+  onDiet,
+  onSocial,
+  onExercise,
 }: {
-  baselines: Baselines;
-  inputsToday: FactorInputs;
+  buffer: number;
+  factors: FactorScore[];
+  depletors: Depletor[];
   best30: number | null;
   isDemo: boolean;
+  diet: number;
+  social: number;
+  exercise: number;
+  onDiet: (n: number) => void;
+  onSocial: (n: number) => void;
+  onExercise: (n: number) => void;
 }) {
-  const [diet, setDiet] = useState(Math.round(inputsToday.diet ?? 6));
-  const [social, setSocial] = useState(Math.round(inputsToday.social ?? 6));
-  const [exercise, setExercise] = useState(Math.round(inputsToday.exercise ?? 20));
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState<"saved" | "demo" | null>(null);
-
-  const { buffer, factors, depletors } = useMemo(() => {
-    const live: FactorInputs = { ...inputsToday, diet, social, exercise };
-    const scored = scoreFactors(live, baselines);
-    return {
-      buffer: bufferFromFactors(scored),
-      factors: scored,
-      depletors: rankDepletors(scored, baselines),
-    };
-  }, [baselines, inputsToday, diet, social, exercise]);
 
   const gap = best30 != null ? best30 - buffer : null;
 
@@ -120,7 +115,7 @@ export function TodayPanel({
             max={10}
             step={1}
             display={`${diet}/10`}
-            onChange={setDiet}
+            onChange={onDiet}
           />
           <Slider
             label="Social support"
@@ -129,7 +124,7 @@ export function TodayPanel({
             max={10}
             step={1}
             display={`${social}/10`}
-            onChange={setSocial}
+            onChange={onSocial}
           />
           <Slider
             label="Exercise"
@@ -138,7 +133,7 @@ export function TodayPanel({
             max={120}
             step={5}
             display={`${exercise}${exercise >= 120 ? "+" : ""} min`}
-            onChange={setExercise}
+            onChange={onExercise}
           />
         </div>
 
