@@ -246,9 +246,21 @@ function HowItWorks() {
 
 function Methodology() {
   return (
-    <details className="card mt-4 p-5 sm:p-7">
-      <summary className="eyebrow cursor-pointer list-none">
+    <details className="card group mt-4 p-5 sm:p-7">
+      <summary className="eyebrow flex cursor-pointer list-none items-center justify-between gap-3">
         The weights, in full
+        <svg
+          viewBox="0 0 24 24"
+          className="size-4 shrink-0 text-muted transition-transform duration-200 group-open:rotate-180"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
       </summary>
       <p className="mt-4 text-sm leading-relaxed text-muted">
         Each factor is compared against your own rolling 30-day baseline, capped

@@ -61,10 +61,6 @@ export function LiveReading({
   return (
     <>
       <div className="mt-4">
-        <CheckEngineLight warning={warning} color={scoreColor(buffer)} />
-      </div>
-
-      <div className="mt-4">
         <TodayPanel
           buffer={buffer}
           factors={factors}
@@ -78,6 +74,10 @@ export function LiveReading({
           onSocial={setSocial}
           onExercise={setExercise}
         />
+      </div>
+
+      <div className="mt-4">
+        <CheckEngineLight warning={warning} color={scoreColor(buffer)} />
       </div>
 
       <section className="card mt-4 p-5 sm:p-7">
