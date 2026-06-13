@@ -1,4 +1,7 @@
 import type { Analysis } from "../scoring";
+import { eventLabel } from "../events/categories";
+import { eventsNearDecline, eventsInTrend } from "../events/narrative";
+import type { TrendEvent } from "../events/types";
 import { clamp, mean, stdDev } from "../scoring/stats";
 
 // The "check-engine light": an early-warning read that looks at the *trajectory*
@@ -49,7 +52,7 @@ const CO_DECLINE_N = 3; // this many firmly-below factors is a pattern
 const FLOOR_PCTILE = 0.2; // "a low day for you" = 20th percentile of history
 const NEAR_FLOOR_PAD = 4; // within this many points of the floor is "near it"
 
-export function detectEarlyWarning(analysis: Analysis): EarlyWarning {
+export function detectEarlyWarning(analysis: Analysis, events: TrendEvent[] = []): EarlyWarning {
   const buffers = analysis.trend.map((p) => p.bufferPct);
   const n = buffers.length;
   const today = analysis.today.bufferPct;
@@ -132,6 +135,26 @@ export function detectEarlyWarning(analysis: Analysis): EarlyWarning {
       key: "floor",
       label: "Near your low line",
       detail: `You're close to your personal low-resilience line (around ${Math.round(floor)}).`,
+    });
+  }
+
+  const declineEvents = eventsNearDecline(analysis.trend, events);
+  if (declineEvents.length > 0 && (sustained || steep)) {
+    const labels = [...new Set(declineEvents.map((e) => eventLabel(e).toLowerCase()))].slice(0, 3);
+    signals.push({
+      key: "tagged",
+      label: "Tagged events nearby",
+      detail: `You marked ${labels.join(", ")} around when the buffer dipped — worth connecting the dots.`,
+    });
+  }
+
+  const recentTags = eventsInTrend(events, analysis.trend.map((p) => p.date)).slice(-3);
+  if (recentTags.length > 0 && !signals.some((s) => s.key === "tagged")) {
+    const labels = recentTags.map((e) => eventLabel(e).toLowerCase());
+    signals.push({
+      key: "context",
+      label: "Life events on the timeline",
+      detail: `Recent tags: ${labels.join(", ")} — these help explain day-to-day swings.`,
     });
   }
 

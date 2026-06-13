@@ -4,11 +4,13 @@ import { loadAnalysis } from "@/lib/data";
 import { FACTORS } from "@/lib/scoring";
 import { scoreLabel } from "@/lib/colors";
 import { detectEarlyWarning } from "@/lib/insight/early-warning";
-import { CheckEngineLight } from "@/components/check-engine-light";
+import { CheckEngineLightWithEvents } from "@/components/check-engine-section";
+import { DashboardEventsShell } from "@/components/dashboard-events-shell";
 import { TodayPanel } from "@/components/today-panel";
-import { TrendChart } from "@/components/trend-chart";
+import { TrendSection } from "@/components/trend-chart";
+import { loadTrendEvents } from "@/lib/events/data";
+import type { TrendEvent } from "@/lib/events/types";
 import { SamplePuller } from "@/components/sample-puller";
-import { ChatWidget } from "@/components/chat-widget";
 import { Logo } from "@/components/logo";
 
 export default async function DashboardPage({
@@ -33,7 +35,9 @@ export default async function DashboardPage({
   }
 
   const analysis = await loadAnalysis(viewer, demo ? seed : undefined);
-  const warning = detectEarlyWarning(analysis);
+  const events: TrendEvent[] =
+    signedIn && viewer ? await loadTrendEvents(viewer.id) : [];
+  const warning = detectEarlyWarning(analysis, events);
 
   const topDepletor = analysis.today.depletors[0]?.label;
   const sampleLine = `This sample reads ${scoreLabel(analysis.today.bufferPct)}${
@@ -43,54 +47,53 @@ export default async function DashboardPage({
   }. Pull another for a different week.`;
 
   return (
-    <div className="flex-1">
-      <SiteHeader signedIn={signedIn} email={signedIn ? viewer!.email : null} />
+    <DashboardEventsShell initialEvents={events} isDemo={demo} demoSeed={seed}>
+      <div className="flex-1">
+        <SiteHeader signedIn={signedIn} email={signedIn ? viewer!.email : null} />
 
-      <main className="mx-auto w-full max-w-5xl px-5 pb-14 sm:px-6">
-        {/* Editorial intro — sets the calm, plain-spoken tone before the data. */}
-        <EditorialIntro eyebrow={demo ? "Sample reading" : "Your daily reading"}>
-          {demo && (
-            <div className="mt-8 space-y-3">
-              <SamplePuller />
-              <p className="max-w-xl text-sm text-muted">{sampleLine}</p>
-            </div>
-          )}
-        </EditorialIntro>
-
-        <HowItWorks />
-
-        <div className="mt-4">
-          <CheckEngineLight warning={warning} />
-        </div>
-
-        <div className="mt-4">
-          <TodayPanel
-            baselines={analysis.baselines}
-            inputsToday={analysis.inputsToday}
-            best30={analysis.best30?.bufferPct ?? null}
-            isDemo={!signedIn}
-            warningLevel={warning.level}
-          />
-        </div>
-
-        <section className="card mt-4 p-5 sm:p-7">
-          <div className="mb-5 flex items-baseline justify-between">
-            <h2 className="eyebrow">Last 30 days</h2>
-            {analysis.best30 && (
-              <span className="text-xs text-muted">
-                best {Math.round(analysis.best30.bufferPct)}
-              </span>
+        <main className="mx-auto w-full max-w-5xl px-5 pb-14 sm:px-6">
+          <EditorialIntro eyebrow={demo ? "Sample reading" : "Your daily reading"}>
+            {demo && (
+              <div className="mt-8 space-y-3">
+                <SamplePuller />
+                <p className="max-w-xl text-sm text-muted">{sampleLine}</p>
+              </div>
             )}
+          </EditorialIntro>
+
+          <HowItWorks />
+
+          <div className="mt-4">
+            <CheckEngineLightWithEvents analysis={analysis} initialWarning={warning} />
           </div>
-          <TrendChart trend={analysis.trend} best={analysis.best30} />
-        </section>
 
-        <ConnectionsNote isDemo={!signedIn} />
-        <Methodology />
-      </main>
+          <div className="mt-4">
+            <TodayPanel
+              baselines={analysis.baselines}
+              inputsToday={analysis.inputsToday}
+              best30={analysis.best30?.bufferPct ?? null}
+              isDemo={!signedIn}
+              warningLevel={warning.level}
+            />
+          </div>
 
-      <ChatWidget seed={demo ? seed : undefined} />
-    </div>
+          <section className="card mt-4 p-5 sm:p-7">
+            <div className="mb-5 flex items-baseline justify-between">
+              <h2 className="eyebrow">Last 30 days</h2>
+              {analysis.best30 && (
+                <span className="text-xs text-muted">
+                  best {Math.round(analysis.best30.bufferPct)}
+                </span>
+              )}
+            </div>
+            <TrendSection trend={analysis.trend} best={analysis.best30} />
+          </section>
+
+          <ConnectionsNote isDemo={!signedIn} />
+          <Methodology />
+        </main>
+      </div>
+    </DashboardEventsShell>
   );
 }
 
