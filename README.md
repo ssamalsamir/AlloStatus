@@ -9,6 +9,27 @@ with one concrete thing you can do about it today.
 The score is transparent on purpose: six factors, each compared against your own
 rolling baseline, combined with literature-anchored weights. No black box.
 
+## The idea
+
+AlloStatus is grounded in **General Adaptation Syndrome (GAS)**, which proposes
+that the body has a finite capacity to adapt to stress. Over time, chronic stress
+raises **allostatic load** — the cumulative wear and tear on the body's
+stress-response systems — gradually depleting that resilience reserve. By
+combining wearable data such as HRV, sleep, and resting heart rate with lifestyle
+factors like stress, exercise, diet, and social support, AlloStatus estimates how
+much of that adaptive capacity you have left through a single **Resilience Buffer
+Score**, and surfaces the factors draining it most.
+
+**What the Resilience Buffer Score represents.** It's a 0–100 reading of how much
+adaptive headroom you have *right now*, measured against your own rolling
+baseline rather than a population norm. A higher score means more reserve to
+absorb a hard day, a poor night, or an acute stressor before it starts to cost
+you; a lower score means you're running closer to depletion and recovery should
+take priority. An average day for you lands near 50, a strong one pushes toward
+the 90s, a rough one toward single digits. It's a *relative* signal of remaining
+capacity — a buffer you spend and replenish — not a clinical or diagnostic
+measurement, and it's deliberately framed as headroom rather than a countdown.
+
 ## Run it
 
 The app runs with **zero setup** in demo mode — with an empty `.env` it boots
