@@ -1,4 +1,5 @@
 import type { EarlyWarning, WarningLevel } from "@/lib/insight/early-warning";
+import type { ScoreBand } from "@/lib/colors";
 import { SupportCard } from "./support-card";
 
 // The check-engine light. A calm status panel that reads the *trajectory* of the
@@ -7,21 +8,37 @@ import { SupportCard } from "./support-card";
 //
 // Colour is supplied by the caller so it matches the buffer dial (the score
 // ramp); the *level* is still legible without colour, via the glyph and halo.
-export function CheckEngineLight({ warning, color }: { warning: EarlyWarning; color: string }) {
-  const lit = warning.level !== "steady";
+export function CheckEngineLight({
+  warning,
+  color,
+  band,
+}: {
+  warning: EarlyWarning;
+  color: string;
+  band: ScoreBand;
+}) {
+  // A red buffer is "at risk" outright: a score in the low band is itself the
+  // alarm, regardless of where the trend is heading — you can already be low and
+  // not currently sliding. So the red band overrides the trajectory headline and
+  // shows the light at full severity; amber and green keep the trajectory read.
+  const atRisk = band === "low";
+  const level: WarningLevel = atRisk ? "warning" : warning.level;
+  const lit = atRisk || warning.level !== "steady";
+  const headline = atRisk ? "At risk" : warning.headline;
+  const summary = atRisk ? AT_RISK_SUMMARY : warning.summary;
 
   return (
     <section className="card overflow-hidden p-5 sm:p-7">
       <div className="flex items-start gap-4 sm:gap-5">
-        <StatusLight level={warning.level} color={color} />
+        <StatusLight level={level} color={color} />
 
         <div className="min-w-0 flex-1">
           <p className="eyebrow">Check-engine light</p>
           <h2 className="font-display mt-1 text-2xl text-foreground sm:text-[1.75rem]">
-            {warning.headline}
+            {headline}
           </h2>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
-            {warning.summary}
+            {summary}
           </p>
         </div>
       </div>
@@ -69,6 +86,9 @@ export function CheckEngineLight({ warning, color }: { warning: EarlyWarning; co
     </section>
   );
 }
+
+const AT_RISK_SUMMARY =
+  "Your buffer has dropped into the low band — this is where strain starts to break things. Whatever the trend is doing, treat today as one to ease off and lean on support; recovering gets harder the longer it sits here.";
 
 // The light reads differently at each level — by glyph *and* by halo, not colour
 // alone, so the state is legible even without colour (and to a colour-blind eye):

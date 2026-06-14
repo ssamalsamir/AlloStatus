@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { reanalyzeWithInputs, type Analysis } from "@/lib/scoring";
-import { scoreColor } from "@/lib/colors";
+import { scoreBand, scoreColor } from "@/lib/colors";
 import { detectEarlyWarning } from "@/lib/insight/early-warning";
 import { useTrendEvents } from "./trend-events-provider";
 import { useLiveInputs } from "./live-inputs-provider";
@@ -67,7 +67,11 @@ export function LiveReading({
       </div>
 
       <div className="mt-4">
-        <CheckEngineLight warning={warning} color={scoreColor(buffer)} />
+        <CheckEngineLight
+          warning={warning}
+          color={scoreColor(buffer)}
+          band={scoreBand(buffer)}
+        />
       </div>
 
       <section className="card mt-4 p-5 sm:p-7">
