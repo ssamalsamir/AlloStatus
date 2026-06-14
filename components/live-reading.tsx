@@ -18,10 +18,10 @@ import { TrendSection } from "./trend-chart";
 // Owns the live "what-if" state for the whole reading. The lifestyle sliders
 // live here — not inside TodayPanel — so dragging one re-colours the dial, the
 // check-engine light and the trend chart together: every score-driven colour
-// reads off the same live buffer. The check-engine light's *colour* follows the
-// live score; its *level* follows the tagged events (re-running the server's
-// trajectory logic on the live event store), so adding or removing a tag updates
-// the warning immediately.
+// reads off the same live buffer. The check-engine light updates whole-cloth
+// with the live reading — colour, level, headline and signals all re-run the
+// server's trajectory logic on the live buffer, factor breakdown and event
+// store, so dragging a slider or adding a tag moves the warning immediately.
 export function LiveReading({
   analysis,
   isDemo,
@@ -45,13 +45,6 @@ export function LiveReading({
     };
   }, [baselines, inputsToday, diet, social, exercise]);
 
-  // The warning level reads off the live event store, so tagging a day re-runs
-  // the same trajectory logic the server uses and the light updates in place.
-  const warning = useMemo(
-    () => detectEarlyWarning(analysis, events),
-    [analysis, events],
-  );
-
   // Today's live value flows into the trend's final point, and the 30-day best
   // is recomputed from it — so dragging today above the old best updates the
   // "best" marker and label instead of leaving them stale.
@@ -66,6 +59,20 @@ export function LiveReading({
     );
     return { liveTrend: t, liveBest: best };
   }, [analysis.trend, buffer]);
+
+  // Re-run the server's trajectory logic on the *live* reading, not the static
+  // one: dragging a slider changes today's buffer, factor breakdown and the
+  // trend's final point, all of which the early-warning model reads. Feeding the
+  // live values in (alongside the live event store) means the light's level,
+  // headline and signals move with the score — not just its colour.
+  const warning = useMemo(() => {
+    const liveAnalysis: Analysis = {
+      ...analysis,
+      today: { ...analysis.today, bufferPct: buffer, factors, depletors },
+      trend: liveTrend,
+    };
+    return detectEarlyWarning(liveAnalysis, events);
+  }, [analysis, buffer, factors, depletors, liveTrend, events]);
 
   return (
     <>
