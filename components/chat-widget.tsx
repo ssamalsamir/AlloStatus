@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTrendEvents } from "@/components/trend-events-provider";
+import { useLiveInputs } from "@/components/live-inputs-provider";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -11,10 +12,13 @@ const SUGGESTIONS = [
   "How do I steady my sleep?",
 ];
 
-// A floating, personalized chat. Events come from the shared TrendEventsProvider
-// so every message includes the latest tags — including edits made this session.
+// A floating, personalized chat. Events and the live what-if inputs both come
+// from shared providers, so every message reflects the reading on screen right
+// now — the latest tags *and* whatever the sliders are set to — not the stale
+// server snapshot.
 export function ChatWidget({ seed }: { seed?: number }) {
   const { events } = useTrendEvents();
+  const { diet, social, exercise } = useLiveInputs();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -42,6 +46,7 @@ export function ChatWidget({ seed }: { seed?: number }) {
           messages: outgoing,
           seed,
           events,
+          inputs: { diet, social, exercise },
         }),
       });
       if (!res.body) throw new Error("no stream");

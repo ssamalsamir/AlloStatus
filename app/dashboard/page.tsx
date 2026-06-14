@@ -35,6 +35,15 @@ export default async function DashboardPage({
   const events: TrendEvent[] =
     signedIn && viewer ? await loadTrendEvents(viewer.id) : [];
 
+  // The live sliders' starting positions, derived once here so the chat and the
+  // reading share the same seed values (LiveReading and the chat both read them
+  // back from the LiveInputsProvider).
+  const initialInputs = {
+    diet: Math.round(analysis.inputsToday.diet ?? 6),
+    social: Math.round(analysis.inputsToday.social ?? 6),
+    exercise: Math.round(analysis.inputsToday.exercise ?? 20),
+  };
+
   const topDepletor = analysis.today.depletors[0]?.label;
   const sampleLine = `This sample reads ${scoreLabel(analysis.today.bufferPct)}${
     topDepletor
@@ -43,7 +52,12 @@ export default async function DashboardPage({
   }. Pull another for a different week.`;
 
   return (
-    <DashboardEventsShell initialEvents={events} isDemo={demo} demoSeed={seed}>
+    <DashboardEventsShell
+      initialEvents={events}
+      initialInputs={initialInputs}
+      isDemo={demo}
+      demoSeed={seed}
+    >
       <div className="flex-1">
         <SiteHeader signedIn={signedIn} email={signedIn ? viewer!.email : null} />
 

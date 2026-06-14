@@ -1,4 +1,4 @@
-import type { Analysis, Baselines, DailyRecord, DayAnalysis } from "./types";
+import type { Analysis, Baselines, DailyRecord, DayAnalysis, FactorInputs } from "./types";
 import { featurize } from "./featurize";
 import { baselinesFrom } from "./baseline";
 import { scoreFactors, bufferFromFactors } from "./score";
@@ -54,6 +54,48 @@ export function analyze(records: DailyRecord[], trendDays = TREND_DAYS): Analysi
     best30,
     baselines: lastBaselines,
     inputsToday: features[features.length - 1].inputs,
+  };
+}
+
+/**
+ * Re-score a reading with today's lifestyle inputs overridden — the exact "what
+ * if I'd eaten better / moved more / leaned on people" recompute the dashboard
+ * sliders drive. Uses the same scoring math as {@link analyze} against the
+ * already-computed baselines, so today's buffer, factor breakdown, depletor
+ * ranking, the trend's final point and the 30-day best all move together. The
+ * single source of truth for live readings: the client uses it to redraw the
+ * dial/light/chart, and the chat route uses it to brief the model on what the
+ * person is actually looking at — not the stale server snapshot.
+ */
+export function reanalyzeWithInputs(
+  analysis: Analysis,
+  overrides: Partial<FactorInputs>,
+): Analysis {
+  const live: FactorInputs = { ...analysis.inputsToday, ...overrides };
+  const factors = scoreFactors(live, analysis.baselines);
+  const bufferPct = bufferFromFactors(factors);
+  const present = factors.filter((f) => f.present).length;
+
+  const trend = analysis.trend.slice();
+  if (trend.length > 0) {
+    trend[trend.length - 1] = { ...trend[trend.length - 1], bufferPct };
+  }
+  const best30 = trend.reduce<Analysis["best30"]>(
+    (best, p) => (!best || p.bufferPct > best.bufferPct ? p : best),
+    null,
+  );
+
+  return {
+    ...analysis,
+    today: {
+      ...analysis.today,
+      bufferPct,
+      factors,
+      depletors: rankDepletors(factors, analysis.baselines),
+      coverage: { present, total: factors.length },
+    },
+    trend,
+    best30,
   };
 }
 
