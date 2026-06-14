@@ -2,7 +2,7 @@ import type { EventCategory } from "./types";
 
 export interface EventCategoryMeta {
   label: string;
-  shortLabel: string;
+  shortLabel: string; 
   /** Small glyph for chart markers — kept to a single character for SVG labels. */
   glyph: string;
   color: string;
